@@ -1,10 +1,15 @@
 # Group Members & Emails (if any):
 
 Zirui Zheng: zirui.zheng92@myhunter.cuny.edu
+
 Takibur Chowdhury: Takibur.Chowdhury28@myhunter.cuny.edu
+
 Mahim Ali: Mahim.Ali32@myhunter.cuny.edu
+
 Justin Wang: justin.wang29@myhunter.cuny.edu
+
 James Crespo: JAMES.CRESPO64@myhunter.cuny.edu
+
 Ashfak Uddin, ashfak.uddin26@myhunter.cuny.edu (Github username: ashfaku)
 
 # Contract Name: ComprehensiveDonationContract
@@ -24,6 +29,7 @@ This contract ensures transparency, accountability, and user engagement while ma
 
 # Interface of Contract with function and event headers
 
+```
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 /// @title Comprehensive Donation Contract
@@ -91,3 +97,4 @@ event DonationReceived(address indexed donor, uint256 amount, uint256 indexed pr
     function getInsurancePoolBalance() external view returns (uint256);
 
 }
+```
