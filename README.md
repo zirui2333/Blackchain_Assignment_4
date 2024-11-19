@@ -61,7 +61,7 @@ Start_Lottery(), randomly select user as winner and award Ether
 
 ## Detail of Interface
 
-```js
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 /// @title Comprehensive Donation Contract
