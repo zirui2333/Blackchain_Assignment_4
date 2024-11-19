@@ -75,58 +75,58 @@ interface IComprehensiveDonation {
 /// @param projectId The ID of the project receiving the donation
 event DonationReceived(address indexed donor, uint256 amount, uint256 indexed projectId);
 
-    /// @notice Emitted when funds are withdrawn from a successful crowdfunding campaign
-    /// @param owner The address of the campaign owner
-    /// @param amount The amount withdrawn
-    /// @param projectId The ID of the project
-    event CrowdfundingWithdrawal(address indexed owner, uint256 amount, uint256 indexed projectId);
+/// @notice Emitted when funds are withdrawn from a successful crowdfunding campaign
+/// @param owner The address of the campaign owner
+/// @param amount The amount withdrawn
+/// @param projectId The ID of the project
+event CrowdfundingWithdrawal(address indexed owner, uint256 amount, uint256 indexed projectId);
 
-    /// @notice Emitted when an insurance claim is approved
-    /// @param claimant The address of the claimant
-    /// @param amount The amount paid from the insurance pool
-    event InsuranceClaimApproved(address indexed claimant, uint256 amount);
+/// @notice Emitted when an insurance claim is approved
+/// @param claimant The address of the claimant
+/// @param amount The amount paid from the insurance pool
+event InsuranceClaimApproved(address indexed claimant, uint256 amount);
 
-    /// @notice Emitted when a lottery winner is chosen
-    /// @param winner The address of the winner
-    /// @param amount The amount won
-    event LotteryWinnerChosen(address indexed winner, uint256 amount);
+/// @notice Emitted when a lottery winner is chosen
+/// @param winner The address of the winner
+/// @param amount The amount won
+event LotteryWinnerChosen(address indexed winner, uint256 amount);
 
-    // Functions
+// Functions
 
-    /// @notice Donate Ether to a specific project
-    /// @param projectId The ID of the project to donate to
-    function donate(uint256 projectId) external payable;
+/// @notice Donate Ether to a specific project
+/// @param projectId The ID of the project to donate to
+function donate(uint256 projectId) external payable;
 
-    /// @notice Start a crowdfunding campaign
-    /// @param goal The funding goal for the campaign
-    /// @param duration The duration of the campaign in seconds
-    /// @return The ID of the newly created project
-    function startCrowdfunding(uint256 goal, uint256 duration) external returns (uint256);
+/// @notice Start a crowdfunding campaign
+/// @param goal The funding goal for the campaign
+/// @param duration The duration of the campaign in seconds
+/// @return The ID of the newly created project
+function startCrowdfunding(uint256 goal, uint256 duration) external returns (uint256);
 
-    /// @notice Withdraw funds from a successful crowdfunding campaign
-    /// @param projectId The ID of the project to withdraw from
-    function withdrawCrowdfundingFunds(uint256 projectId) external;
+/// @notice Withdraw funds from a successful crowdfunding campaign
+/// @param projectId The ID of the project to withdraw from
+function withdrawCrowdfundingFunds(uint256 projectId) external;
 
-    /// @notice Submit a claim for financial aid from the insurance pool
-    /// @param amount The amount being claimed
-    function submitInsuranceClaim(uint256 amount) external;
+/// @notice Submit a claim for financial aid from the insurance pool
+/// @param amount The amount being claimed
+function submitInsuranceClaim(uint256 amount) external;
 
-    /// @notice Approve a submitted insurance claim
-    /// @param claimant The address of the claimant
-    /// @param amount The amount to be paid
-    function approveInsuranceClaim(address claimant, uint256 amount) external;
+/// @notice Approve a submitted insurance claim
+/// @param claimant The address of the claimant
+/// @param amount The amount to be paid
+function approveInsuranceClaim(address claimant, uint256 amount) external;
 
-    /// @notice Trigger the lottery and choose a winner
-    /// @return winner The address of the lottery winner
-    function triggerLottery() external returns (address);
+/// @notice Trigger the lottery and choose a winner
+/// @return winner The address of the lottery winner
+function triggerLottery() external returns (address);
 
-    /// @notice Get the total amount donated to the contract
-    /// @return The total amount of Ether donated
-    function getTotalDonations() external view returns (uint256);
+/// @notice Get the total amount donated to the contract
+/// @return The total amount of Ether donated
+function getTotalDonations() external view returns (uint256);
 
-    /// @notice Get the balance of the insurance pool
-    /// @return The total amount of Ether in the insurance pool
-    function getInsurancePoolBalance() external view returns (uint256);
+/// @notice Get the balance of the insurance pool
+/// @return The total amount of Ether in the insurance pool
+function getInsurancePoolBalance() external view returns (uint256);
 
 }
 ```
