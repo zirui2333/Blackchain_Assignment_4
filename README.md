@@ -29,7 +29,7 @@ This contract ensures transparency, accountability, and user engagement while ma
 
 # Interface of Contract with function and event headers
 
-```js
+```C++
 Donation System
 
 History_DonateRecived(donor, amount, projectID), when someone donates a project or event
