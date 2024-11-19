@@ -29,7 +29,7 @@ This contract ensures transparency, accountability, and user engagement while ma
 
 # Interface of Contract with function and event headers
 
-```
+```js
 Donation System
 
 History_DonateRecived(donor, amount, projectID), when someone donates a project or event
@@ -51,14 +51,13 @@ Check_Insurance_Pool_Balance(): Return the amount of available Ether in the pool
 Lottery Contract
 
 History_LotteryWin(Winner, amount), when someone wins a lottery
-
 Start_Lottery(), randomly select user as winner and award Ether
 
 ```
 
-
 ## Detail of Interface
-```
+
+```js
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 /// @title Comprehensive Donation Contract
