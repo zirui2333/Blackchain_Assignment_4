@@ -4,17 +4,14 @@
 
 # Group Members & Emails (if any):
 
-Zirui Zheng: zirui.zheng92@myhunter.cuny.edu
-
-Takibur Chowdhury: Takibur.Chowdhury28@myhunter.cuny.edu
-
-Mahim Ali: Mahim.Ali32@myhunter.cuny.edu
-
-Justin Wang: justin.wang29@myhunter.cuny.edu
-
-James Crespo: JAMES.CRESPO64@myhunter.cuny.edu
-
-Ashfak Uddin, ashfak.uddin26@myhunter.cuny.edu (Github username: ashfaku)
+| Name              | Email Address                         | GitHub Username |
+| ----------------- | ------------------------------------- | --------------- |
+| Zirui Zheng       | zirui.zheng92@myhunter.cuny.edu       | zirui2333       |
+| Takibur Chowdhury | Takibur.Chowdhury28@myhunter.cuny.edu | Taki127         |
+| Mahim Ali         | Mahim.Ali32@myhunter.cuny.edu         | mahimali937     |
+| Justin Wang       | justin.wang29@myhunter.cuny.edu       | nycjustinw      |
+| James Crespo      | JAMES.CRESPO64@myhunter.cuny.edu      |                 |
+| Ashfak Uddin      | ashfak.uddin26@myhunter.cuny.edu      | ashfaku         |
 
 # Contract Name: ComprehensiveDonationContract
 
