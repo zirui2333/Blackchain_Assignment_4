@@ -10,7 +10,7 @@
 | Takibur Chowdhury | Takibur.Chowdhury28@myhunter.cuny.edu | Taki127         |
 | Mahim Ali         | Mahim.Ali32@myhunter.cuny.edu         | mahimali937     |
 | Justin Wang       | justin.wang29@myhunter.cuny.edu       | nycjustinw      |
-| James Crespo      | JAMES.CRESPO64@myhunter.cuny.edu      | jamecre         |
+| James Crespo      | JAMES.CRESPO64@myhunter.cuny.edu      | jamcre         |
 | Ashfak Uddin      | ashfak.uddin26@myhunter.cuny.edu      | ashfaku         |
 
 # Contract Name: DonationContract
