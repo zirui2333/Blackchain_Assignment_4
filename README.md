@@ -30,7 +30,6 @@ This contract ensures transparency, accountability, and user engagement while ma
 
 # Interface of Contract with function and event headers
 
-```solidity
 Donation System
 
 History_DonateRecived(donor, amount, projectID), history details when someone donates a project or event
@@ -58,7 +57,6 @@ Lottery Contract:
 History_LotteryWin(Winner, amount), history details when someone wins a lottery
 Start_Lottery(), randomly select user as winner and award Ether
 
-```
 
 ## Detail of Interface
 
