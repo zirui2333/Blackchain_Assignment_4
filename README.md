@@ -1,7 +1,3 @@
-# Github Repo Link
-
-[Link Portal](https://github.com/zirui2333/Blockchain_Assignment_4)
-
 # Group Members & Emails (if any):
 
 | Name              | Email Address                         | GitHub Username |
@@ -12,6 +8,10 @@
 | Justin Wang       | justin.wang29@myhunter.cuny.edu       | nycjustinw      |
 | James Crespo      | JAMES.CRESPO64@myhunter.cuny.edu      |                 |
 | Ashfak Uddin      | ashfak.uddin26@myhunter.cuny.edu      | ashfaku         |
+
+# Github Repo Link
+
+[Link Portal](https://github.com/zirui2333/Blockchain_Assignment_4)
 
 # Contract Name: ComprehensiveDonationContract
 
