@@ -13,7 +13,7 @@
 | James Crespo      | JAMES.CRESPO64@myhunter.cuny.edu      | jamecre         |
 | Ashfak Uddin      | ashfak.uddin26@myhunter.cuny.edu      | ashfaku         |
 
-# Contract Name: ComprehensiveDonationContract
+# Contract Name: DonationContract
 
 ## Purpose of Contract:
 
