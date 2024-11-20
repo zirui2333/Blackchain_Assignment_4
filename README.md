@@ -32,30 +32,30 @@ This contract ensures transparency, accountability, and user engagement while ma
 
 Donation System
 
-History_DonateRecived(donor, amount, projectID), history details when someone donates a project or event
+```History_DonateRecived(donor, amount, projectID)```, history details when someone donates a project or event
 Donate(projectID), enable people to send Ether to a specific project
 GetTotalDonations(), return total amount of donations across all projects
 
 
 Crowdfunding Platform
 
-History_CrowdFunding_Withdrawal(owner, amount, projectID), history details when someone withdraw funds from a successful crowdfunding campaigns
-Start_Crowdfunding(goal, duration), enable people to set up crowdfunding with certain amount and deadline
-Withdraw_CrowdFunding(projectID), Allow owner to withdraw funding when goal amount is met
+```History_CrowdFunding_Withdrawal(owner, amount, projectID)```, history details when someone withdraw funds from a successful crowdfunding campaigns
+```Start_Crowdfunding(goal, duration)```, enable people to set up crowdfunding with certain amount and deadline
+```Withdraw_CrowdFunding(projectID)```, Allow owner to withdraw funding when goal amount is met
 
 
 Decentralized Insurance Pool:
 
-History_InsuranceApproved(Customer, amount), history details when insurance approved
-Send_Insurance_Request(amount), enable user to claim financial request
-Approve_Insurance_Request(Customer address, amount), enable company to approve the request
-Check_Insurance_Pool_Balance(): Return the amount of available Ether in the current pool
+```History_InsuranceApproved(Customer, amount)```, history details when insurance approved
+```Send_Insurance_Request(amount)```, enable user to claim financial request
+```Approve_Insurance_Request(Customer address, amount)```, enable company to approve the request
+```Check_Insurance_Pool_Balance()``` Return the amount of available Ether in the current pool
 
 
 Lottery Contract:
 
-History_LotteryWin(Winner, amount), history details when someone wins a lottery
-Start_Lottery(), randomly select user as winner and award Ether
+```History_LotteryWin(Winner, amount)```, history details when someone wins a lottery
+```Start_Lottery()```, randomly select user as winner and award Ether
 
 
 ## Detail of Interface
