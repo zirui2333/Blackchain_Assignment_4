@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/ziruizheng/Desktop/College Class/Now/Blockchain/Blackchain_Assignment_4/contracts/functions.sol": {
+      "lastModificationDate": 1733170791620,
+      "contentHash": "19697ecd448431661d6d43219b566c3f",
+      "sourceName": "contracts/functions.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "DecentralizedInsurance"
+      ]
+    }
+  }
+}
