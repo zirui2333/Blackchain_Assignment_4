@@ -4,39 +4,38 @@ pragma solidity ^0.8.0;
 contract DecentralizedInsurance {
 
     struct InsurancePlan {
-        uint id;
-        address company;
-        string name;
-        string description;
-        uint premium; // in Wei
-        uint coverageAmount; // Amount insured
+        uint id; 
+        address company;  // Provider name
+        string name;  // Plan name
+        string description;  // What does this plan do
+        uint premium; // in ether
+        uint coverageAmount; // Amount covered
         uint duration; // in days
         bool isActive;
     }
 
     struct Request {
         uint id;
-        address customer;
-        uint planId;
-        bool isApproved;
-        bool isDenied;
+        address customer; 
+        uint planId; 
+        bool isApproved; // If request is approved or not
     }
 
     struct Company {
-        address addr;
+        address addr;  
         string name;
-        uint trustScore;
+        uint rate;  // Rating and trusting purpose
     }
 
     struct Customer {
         address addr;
-        uint trustScore;
+        uint rate;  // Rating and trusting purpose
     }
 
     uint private platformFee = 5; // 5% platform fee on each transaction
     address private admin;
-    uint private nextPlanId = 1;
-    uint private nextRequestId = 1;
+    uint private next_plan_id = 1;
+    uint private next_request_id = 1;
 
     mapping(uint => InsurancePlan) public insurancePlans;
     mapping(uint => Request) public requests;
@@ -45,7 +44,7 @@ contract DecentralizedInsurance {
 
     event PlanCreated(uint planId, address company);
     event RequestSubmitted(uint requestId, address customer, uint planId);
-    event RequestResponded(uint requestId, bool isApproved, bool isDenied);
+    event RequestResponded(uint requestId, bool isApproved);
     event PremiumPaid(uint planId, address customer, uint amount);
 
     constructor() {
@@ -54,11 +53,12 @@ contract DecentralizedInsurance {
 
     // CUSTOMER FUNCTIONS
 
+    // Return a list of active plan 
     function viewPlans() external view returns (InsurancePlan[] memory) {
-        InsurancePlan[] memory activePlans = new InsurancePlan[](nextPlanId - 1);
+        InsurancePlan[] memory activePlans = new InsurancePlan[](next_plan_id - 1);
         uint index = 0;
 
-        for (uint i = 1; i < nextPlanId; i++) {
+        for (uint i = 1; i < next_plan_id; i++) {
             if (insurancePlans[i].isActive) {
                 activePlans[index] = insurancePlans[i];
                 index++;
@@ -68,26 +68,26 @@ contract DecentralizedInsurance {
         return activePlans;
     }
 
+    // Set a limitation of request a customer can submit
     function submitRequest(uint _planId) external {
         require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
 
-        requests[nextRequestId] = Request({
-            id: nextRequestId,
+        requests[next_request_id] = Request({
+            id: next_request_id,
             customer: msg.sender,
             planId: _planId,
             isApproved: false,
-            isDenied: false
         });
 
-        emit RequestSubmitted(nextRequestId, msg.sender, _planId);
-        nextRequestId++;
+        emit RequestSubmitted(next_request_id, msg.sender, _planId);
+        next_request_id++;
     }
 
     function denyOffer(uint _requestId) external {
         Request storage req = requests[_requestId];
         require(req.customer == msg.sender, "Not authorized.");
         require(!req.isApproved, "Request already approved.");
-        req.isDenied = true;
+        req.isApproved = false;
     }
 
     function payPremium(uint _planId) external payable {
@@ -107,8 +107,8 @@ contract DecentralizedInsurance {
     function createPlan(string memory _name, string memory _description, uint _premium, uint _coverageAmount, uint _duration) external {
         require(companies[msg.sender].addr != address(0), "Not a registered company.");
 
-        insurancePlans[nextPlanId] = InsurancePlan({
-            id: nextPlanId,
+        insurancePlans[next_plan_id] = InsurancePlan({
+            id: next_plan_id,
             company: msg.sender,
             name: _name,
             description: _description,
@@ -118,8 +118,8 @@ contract DecentralizedInsurance {
             isActive: true
         });
 
-        emit PlanCreated(nextPlanId, msg.sender);
-        nextPlanId++;
+        emit PlanCreated(next_plan_id, msg.sender);
+        next_plan_id++;
     }
 
     function respondToRequest(uint _requestId, bool _approve) external {
@@ -130,10 +130,10 @@ contract DecentralizedInsurance {
         if (_approve) {
             req.isApproved = true;
         } else {
-            req.isDenied = true;
+            req.isApproved = false;
         }
 
-        emit RequestResponded(_requestId, req.isApproved, req.isDenied);
+        emit RequestResponded(_requestId, req.isApproved);
     }
 
     // ADMIN FUNCTIONS
