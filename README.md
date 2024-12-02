@@ -23,8 +23,8 @@ The Insurance Trading System is a blockchain-based platform designed to enhance 
 
 ### For Customers
 
-1. View Insurance Plans: Customers can view a list of available insurance plans with details like coverage, premium, duration, and provider (company) name.
-2. Request Insurance: Submit a request for insurance.
+1. `View Insurance Plans`: Customers can view a list of available insurance plans with details like coverage, premium, duration, and provider (company) name.
+2. `Request Insurance`: Submit a request for insurance.
 3. Deny Offers: Deny offers provided by the insurance company.
 4. Pay Premium: Securely transfer funds for accepted insurance agreements.
 5. Rate Company: Provide feedback or ratings for the company after the agreement ends, contributing to the trust system.
