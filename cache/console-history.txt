@@ -1,0 +1,24 @@
+console.log(plans);
+const plans = await insurance.viewPlans();
+const insurance = await Insurance.attach("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0")
+const Insurance = await ethers.getContractFactory("DecentralizedInsurance"); 
+const plans = await insurance.viewPlans();
+const insurance = await Insurance.attach("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512");
+const plans = await insurance.viewPlans();
+await Insurance.attach('0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512')
+const insurance = await Insurance.attach(“0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512")
+const Insurance = await ethers.getContractFactory("DecentralizedInsurance"); 
+console.log(plans);
+const plans = await insurance.viewPlans();
+await Insurance.attach("0x5FbDB2315678afecb367f032d93F642f64180aa3")
+npx hardhat run scripts/deploy.js --network localhost
+console.log(plans);
+const plans = await insurance.viewPlans();
+console.log(plans);const plans = await insurance.viewPlans();
+const plans = await insurance.viewPlans();
+const insurance = await Insurance.attach("0x5FbDB2315678afecb367f032d93F642f64180aa3");
+const Insurance = await ethers.getContractFactory("DecentralizedInsurance");
+npx hardhat node
+const plans = await insurance.viewPlans();
+const insurance = await Insurance.attach("YOUR_DEPLOYED_CONTRACT_ADDRESS");
+const Insurance = await ethers.getContractFactory("DecentralizedInsurance");
