@@ -10,11 +10,7 @@
 | Takibur Chowdhury | Takibur.Chowdhury28@myhunter.cuny.edu | Taki127         |
 | Mahim Ali         | Mahim.Ali32@myhunter.cuny.edu         | mahimali937     |
 | Justin Wang       | justin.wang29@myhunter.cuny.edu       | nycjustinw      |
-<<<<<<< HEAD
-| James Crespo      | JAMES.CRESPO64@myhunter.cuny.edu      | jamcre          |
-=======
 | James Crespo      | JAMES.CRESPO64@myhunter.cuny.edu      | jamcre         |
->>>>>>> 2644f55a8a26d27acf3b74e568da416c3f4dff1a
 | Ashfak Uddin      | ashfak.uddin26@myhunter.cuny.edu      | ashfaku         |
 
 # Contract Name: DonationContract
@@ -49,11 +45,8 @@ Claim Submission: Submit claims to request the claim settlements
 
 # Interface of Contract with function and event headers
 
-<<<<<<< HEAD
 ````solidity
 
-=======
->>>>>>> 2644f55a8a26d27acf3b74e568da416c3f4dff1a
 Donation System
 
 ```History_DonateRecived(donor, amount, projectID)```, history details when someone donates a project or event
