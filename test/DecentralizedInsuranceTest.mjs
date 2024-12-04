@@ -69,10 +69,6 @@ console.log("----------------  Test 1. Register Function------------------------
     
 });
 
-
-
-
-
 // ---------------------------  Test 2. User interacts with plans and requests  --------------------------------
 
 /* Scenario:
@@ -89,6 +85,7 @@ console.log("----------------  Test 1. Register Function------------------------
    it("Should allow user to view plans, submit a request, and handle negotiation process", async function () {
         console.log("\n\n")
         console.log("----------------  Test 2. User interacts with plans and requests --------------------");
+
         // Register companies
         await insurance.connect(admin).registerCompany("AdminCompany1", 10);
         await insurance.connect(admin).registerCompany("AdminCompany2", 15);
@@ -97,12 +94,12 @@ console.log("----------------  Test 1. Register Function------------------------
         const company1 = await insurance.companies(1); // companyId 1
         const company2 = await insurance.companies(2); // companyId 2
 
-        // Ensure you are using the correct signer to call createPlan
+        // Retrieve company data
         const company1Signer = await ethers.getSigner(company1.addr); // Get signer for company1
         const company2Signer = await ethers.getSigner(company2.addr); // Get signer for company2
 
 
-        // Step 1: Creates plans
+        // Creates plans
         await insurance.connect(company1Signer).createPlan(
             "Basic Plan",
             "This is a basic plan with testing amount.",
@@ -111,7 +108,8 @@ console.log("----------------  Test 1. Register Function------------------------
             365 // Duration = 1 year
         );
 
-        console.log("Plan 1 created!");
+        console.log("Basic plan created!");
+        
         await insurance.connect(company2Signer).createPlan(
             "Premium Plan",
             "This is a premium plan with higher coverage.",
@@ -128,16 +126,17 @@ console.log("----------------  Test 1. Register Function------------------------
             365 // Duration = 1 year
         );
 
-        console.log("Plan 2 & 3 created!");
+        console.log("Ultimate plan created!");
 
 
-        // Step 2: User view plan and sumbit request
+        // User view plan and sumbit request
         const plans = await insurance.viewPlans();
         console.log("\nList of Plans:");
         for (let i = 0; i < plans.length; i++) {
             console.log(`Plan`, i + 1, `: `, plans[i].name, `(`, ethers.utils.formatEther(plans[i].premium), `ETH)`);
         }
 
+        // User selects plan and submits request
         console.log("\nUser views the plans and interests at Premium plan");
         let planID = 2;
         try{
@@ -148,15 +147,15 @@ console.log("----------------  Test 1. Register Function------------------------
         console.log("User submitted a request to Premium plan company");
         
 
-        // Step 3: Company pull list and view existing request
+        // Company pull list and view existing request
         const company2Requests = await insurance.connect(company2Signer).viewRequests();
         console.log("\nCompany 2's Requests:");
         for (let i = 0; i < company2Requests.length; i++) {
             console.log(`Request ${i + 1}: ID: ${company2Requests[i].planId}`);
         }
 
-
-        // Step 4: Company approve
+ 
+        // Company approves request
         console.log("\nCompany 2 sees the request and approve the request");
         const requestId = company2Requests[0].id;
         try{

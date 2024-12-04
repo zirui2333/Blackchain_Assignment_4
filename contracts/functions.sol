@@ -116,9 +116,30 @@ function denyOffer(uint _requestId) external {
     require(req.customer == msg.sender, "Not authorized.");
     // Ensure the request has not already been approved
     require(!req.isApproved, "Request already approved.");
+    // Ensure the request has been approved by the company
+    require(req.isApproved, "Request is not approved.");
     // Deny the offer by setting isApproved to false
     req.isApproved = false;
 }
+
+function acceptOffer(uint _requestId) external {
+    // Retrieve the request from storage
+    Request storage req = requests[_requestId];
+    // Ensure the caller is the customer who made the request
+    require(req.customer == msg.sender, "Not authorized.");
+    // Ensure the request has been approved by the company
+    require(req.isApproved, "Request is not approved.");
+    // Ensure no claim has already been made on this request
+    require(!req.isClaimed, "Request already claimed.");
+    // Accept the offer by setting isApproved to true
+    req.isClaimed = true;
+
+    // Set the claim amount to the approved amount (if applicable)
+    require(req.claimAmount > 0, "Invalid claim amount.");
+
+    payable(req.customer).transfer(req.claimAmount); // Not sure how to check this yet
+}
+
 
 function payPremium(uint _planId) external payable {
     // Retrieve the insurance plan from storage
@@ -270,7 +291,6 @@ function banParticipant(uint _companyId) external {
 function registerCompany(string memory _name, uint _rate) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
-
 
     // Check if the company name is already registered
     for (uint i = 1; i < nextCompanyId; i++) {
