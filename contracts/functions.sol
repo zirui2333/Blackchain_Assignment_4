@@ -51,9 +51,7 @@ contract DecentralizedInsurance {
     mapping(address => uint256) public companyIds; // Mapping of company addresses to their IDs
     mapping(address => Customer) public customers; // Mapping of customer addresses to Customer structs
     mapping(bytes32 => bool) public bannedCompanyNames; // List of banned companies, bool is set to true if banned
-   
-    // ban list array of banned companies
-    
+       
    // Event emitted when a new insurance plan is created
     event PlanCreated(uint planId, uint companyId);
     // Event emitted when a customer submits a request
@@ -306,6 +304,19 @@ function changePlanStatus(uint _planId, bool _status) external {
     require(insurancePlans[_planId].isActive != _status, "No change in status.");
 
     insurancePlans[_planId].isActive = _status;
+}
+function unbanCompany(string memory _name) external {
+    // Ensure only the admin can call this function
+    require(msg.sender == admin, "Only admin.");
+
+    // Hash the company name to use as the key for banned names
+    bytes32 nameHash = keccak256(abi.encodePacked(_name));
+
+    // Ensure the company is currently banned
+    require(bannedCompanyNames[nameHash], "Company is not banned.");
+
+    // Remove the company from the banned list
+    bannedCompanyNames[nameHash] = false;
 }
 function banCompany(uint _companyId) external {
     // Ensure that only the admin can call this function
