@@ -29,7 +29,7 @@ contract DecentralizedInsurance {
         uint id; // Unique identifier for the company
         address addr; // Ethereum address of the company
         string name; // Name of the company
-        uint rate; // Rating or score of the company
+        uint customer_rating; // Rating or score of the company
     }
 
     // Structure to represent a customer
@@ -337,7 +337,7 @@ function registerCompany(string memory _name, uint _rate) external {
         id: nextCompanyId,
         addr: msg.sender, // Address of the company owner (or admin registering the company)
         name: _name,
-        rate: _rate
+        customer_rating: _rate
     });
 
     // Map the company's address to its company ID
