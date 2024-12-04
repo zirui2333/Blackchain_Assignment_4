@@ -124,10 +124,11 @@ contract DecentralizedInsurance {
             companies[nextCompanyId].addr != address(0),
             "Not a registered company."
         );
+        uint256 companyId = companyIds[msg.sender];
 
         insurancePlans[nextPlanId] = InsurancePlan({
             id: nextPlanId,
-            companyId: nextCompanyId, // Use companyId here
+            companyId: companyId, // Use companyId here
             name: _name,
             description: _description,
             premium: _premium,
@@ -136,7 +137,7 @@ contract DecentralizedInsurance {
             isActive: true
         });
 
-        emit PlanCreated(nextPlanId, nextCompanyId);
+        emit PlanCreated(nextPlanId, companyId);
         nextPlanId++;
     }
 
