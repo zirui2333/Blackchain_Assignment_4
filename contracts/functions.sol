@@ -36,6 +36,7 @@ contract DecentralizedInsurance {
     struct Customer {
         address addr; // Ethereum address of the customer
         uint rate; // Rating or risk score of the customer
+        bool isRegistered; //Check to see if customer is added
     }
 
     uint private platformFee = 5; // Platform fee percentage (5%)
@@ -61,6 +62,9 @@ contract DecentralizedInsurance {
     // Event emitted when a claim is settled
     event ClaimSettled(uint requestId, uint claimAmount);
 
+    // Added an event to log registrations
+    event CustomerRegistered(address customer, uint rate);
+
     constructor() {
         admin = msg.sender; // Set the contract deployer as the admin
         nextCompanyId = 1; // Start company IDs from 1
@@ -68,6 +72,19 @@ contract DecentralizedInsurance {
 }
 
     // CUSTOMER FUNCTIONS
+
+function registerCustomer(uint _rate) external {
+    // Check if customer is registered
+    require(!customers[msg.sender].isRegistered, "Customer already registered.");
+    // Register the customer
+    customers[msg.sender] = Customer({
+        addr: msg.sender,
+        rate: _rate,
+        isRegistered: true
+    });
+    // Emit event
+    emit CustomerRegistered(msg.sender, _rate);
+}
 
 function viewPlans() external view returns (InsurancePlan[] memory) {
     // Create an array to hold active insurance plans
@@ -92,6 +109,7 @@ function viewPlans() external view returns (InsurancePlan[] memory) {
 function submitRequest(uint _planId) external {
     // Ensure the selected insurance plan is active
     require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
+    require(customers[msg.sender].isRegistered, "Customer not registered.");
 
     // Create a new insurance request for the customer
     requests[nextRequestId] = Request({
@@ -123,7 +141,6 @@ function denyOffer(uint _requestId) external {
 }
 
 function acceptOffer(uint _requestId) external {
-    // Retrieve the request from storage
     Request storage req = requests[_requestId];
     // Ensure the caller is the customer who made the request
     require(req.customer == msg.sender, "Not authorized.");
@@ -134,7 +151,7 @@ function acceptOffer(uint _requestId) external {
     // Accept the offer by setting isApproved to true
     req.isClaimed = true;
 
-    // Set the claim amount to the approved amount (if applicable)
+    // Set the claim amount to the approved amount
     require(req.claimAmount > 0, "Invalid claim amount.");
 
     payable(req.customer).transfer(req.claimAmount); // Not sure how to check this yet

@@ -126,7 +126,7 @@ console.log("----------------  Test 1. Register Function------------------------
             365 // Duration = 1 year
         );
 
-        console.log("Ultimate plan created!");
+        console.log("Ultimate plan and premium plan created!");
 
 
         // User view plan and sumbit request
@@ -138,7 +138,7 @@ console.log("----------------  Test 1. Register Function------------------------
 
         // User selects plan and submits request
         console.log("\nUser views the plans and interests at Premium plan");
-        let planID = 2;
+        let planID = 2;  // Premium plan ID = 2
         try{
             await insurance.connect(customer).submitRequest(planID);
         }catch(error){
