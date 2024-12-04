@@ -206,7 +206,15 @@ function payPremium(uint _planId) external payable {
         emit PlanCreated(nextPlanId, companyId);
         nextPlanId++;
     }
+    // true to pause plan, false to unpause
+    function changePlanStatus(uint _planId, bool _status) external {
+    	uint256 companyId = companyIds[msg.sender];
+    	require(companies[companyId].addr != address(0), "Not a registered company.");
+    	require(insurancePlans[_planId].companyId == companyId, "Not authorized.");
+    	require(insurancePlans[_planId].isActive != _status, "No change in status.");
 
+        insurancePlans[_planId].isActive = _status;
+    }
     // View all requests for a company
     function viewRequests() external view returns (Request[] memory) {
         uint count = 0;
