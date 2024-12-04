@@ -248,29 +248,39 @@ function payPremium(uint _planId) external payable {
         emit ClaimSettled(_requestId, claimAmount);
     }
 
-    // ADMIN FUNCTIONS
-    function setPlatformFee(uint _fee) external {
-        require(msg.sender == admin, "Only admin.");
-        platformFee = _fee;
-    }
+  // ADMIN FUNCTIONS
 
-    function banParticipant(uint _companyId) external {
-        require(msg.sender == admin, "Only admin.");
-        delete companies[_companyId]; // Deleting by companyId
-        delete customers[companies[_companyId].addr]; // Delete customer by address linked to company
-    }
+function setPlatformFee(uint _fee) external {
+    // Ensure that only the admin can call this function
+    require(msg.sender == admin, "Only admin.");
+    // Update the platform fee with the new value provided
+    platformFee = _fee;
+}
 
-    function registerCompany(string memory _name, uint _rate) external {
-        require(msg.sender == admin, "Only admin.");
+function banParticipant(uint _companyId) external {
+    // Ensure that only the admin can call this function
+    require(msg.sender == admin, "Only admin.");
+    // Delete the company from the companies mapping using the company ID
+    delete companies[_companyId]; // Deleting by companyId
+    // Delete the customer associated with the company's address
+    // Note: Accessing companies[_companyId].addr after deletion may result in a default value (address(0))
+    delete customers[companies[_companyId].addr]; // Delete customer by address linked to company
+}
 
-        companies[nextCompanyId] = Company({
-            id: nextCompanyId,
-            addr: msg.sender, // Address of the company owner (or admin registering the company)
-            name: _name,
-            rate: _rate
-        });
+function registerCompany(string memory _name, uint _rate) external {
+    // Ensure that only the admin can call this function
+    require(msg.sender == admin, "Only admin.");
 
-        companyIds[msg.sender] = nextCompanyId;
-        nextCompanyId++; // Increment to the next company id
-    }
+    // Register a new company and store it in the companies mapping
+    companies[nextCompanyId] = Company({
+        id: nextCompanyId,
+        addr: msg.sender, // Address of the company owner (or admin registering the company)
+        name: _name,
+        rate: _rate
+    });
+
+    // Map the company's address to its company ID
+    companyIds[msg.sender] = nextCompanyId;
+    // Increment to the next company ID for future registrations
+    nextCompanyId++; // Increment to the next company id
 }
