@@ -74,10 +74,6 @@ contract DecentralizedInsurance {
     }
 
     function submitRequest(uint _planId) external {
-        require(
-            customers[msg.sender].addr != address(0),
-            "Customer not registered."
-        );
         require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
 
         requests[nextRequestId] = Request({
@@ -120,11 +116,12 @@ contract DecentralizedInsurance {
         uint _coverageAmount,
         uint _duration
     ) external {
+        uint256 companyId = companyIds[msg.sender];
         require(
-            companies[nextCompanyId].addr != address(0),
+            companies[companyId].addr != address(0),
             "Not a registered company."
         );
-        uint256 companyId = companyIds[msg.sender];
+        
 
         insurancePlans[nextPlanId] = InsurancePlan({
             id: nextPlanId,
