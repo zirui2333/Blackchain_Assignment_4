@@ -42,3 +42,4 @@ The Insurance Trading System is a blockchain-based platform designed to enhance 
 
 1. `Charge Fees`: Automatically deduct a platform fee for every successful transaction.
 2. `Ban Participants`: Remove users or companies who violate the platform's rules.
+3. `registerCompany` : Register for new companies
