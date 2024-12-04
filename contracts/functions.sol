@@ -50,8 +50,11 @@ contract DecentralizedInsurance {
     mapping(uint => Company) public companies; // Mapping of company IDs to Company structs
     mapping(address => uint256) public companyIds; // Mapping of company addresses to their IDs
     mapping(address => Customer) public customers; // Mapping of customer addresses to Customer structs
-
-    // Event emitted when a new insurance plan is created
+   
+    // ban list array of banned companies
+    uint[] public bannedCompanies;
+    
+   // Event emitted when a new insurance plan is created
     event PlanCreated(uint planId, uint companyId);
     // Event emitted when a customer submits a request
     event RequestSubmitted(uint requestId, address customer, uint planId);
@@ -308,11 +311,20 @@ function setPlatformFee(uint _fee) external {
 function banParticipant(uint _companyId) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
-    // Delete the company from the companies mapping using the company ID
-    delete companies[_companyId]; // Deleting by companyId
+
+    // Retrieve the company's address before deletion
+    address companyAddress = companies[_companyId].addr;
+
+    // Add the companyId to the banned list
+    bannedCompanies.push(_companyId);
+
+    // Delete the company from the companies mapping
+    delete companies[_companyId];
+
     // Delete the customer associated with the company's address
-    // Note: Accessing companies[_companyId].addr after deletion may result in a default value (address(0))
-    delete customers[companies[_companyId].addr]; // Delete customer by address linked to company
+    if (companyAddress != address(0)) {
+        delete customers[companyAddress];
+    }
 }
 
 function registerCompany(string memory _name, uint _rate) external {
