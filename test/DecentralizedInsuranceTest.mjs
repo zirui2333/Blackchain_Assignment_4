@@ -90,7 +90,7 @@ console.log("----------------  Test 1. Register Function------------------------
         const company2Signer = await ethers.getSigner(company2.addr); // Get signer for company2
 
 
-        // Step 1: Company 1 creates a plan
+        // Step 1: Creates plans
         await insurance.connect(company1Signer).createPlan(
             "Basic Plan",
             "This is a basic plan with testing amount.",
@@ -118,6 +118,8 @@ console.log("----------------  Test 1. Register Function------------------------
 
         console.log("Plan 2 & 3 created!");
 
+
+        // Step 2: User view plan and sumbit request
         const plans = await insurance.viewPlans();
         console.log("\nList of Plans:");
         for (let i = 0; i < plans.length; i++) {
@@ -125,9 +127,32 @@ console.log("----------------  Test 1. Register Function------------------------
         }
 
         console.log("\nUser views the plans and interests at Premium plan");
-        const planID = 2;
+        let planID = 2;
         await insurance.connect(customer).submitRequest(planID);
         console.log("User submitted a request to Premium plan company");
+        
+
+        // Step 3: Company pull list and view existing request
+        const company2Requests = await insurance.connect(company2Signer).viewRequests();
+        console.log("\nCompany 2's Requests:");
+        for (let i = 0; i < company2Requests.length; i++) {
+            console.log(`Request ${i + 1}: ID: ${company2Requests[i].planId}`);
+        }
+
+
+        // Step 4: Company approve
+        console.log("\nCompany 2 sees the request and approve the request");
+        const requestId = company2Requests[0].id;
+        try{
+            await insurance.connect(company2Signer).Request_Negotiation(requestId, true, 0);
+        }catch(error){
+            console.log("Error in step 4")
+        }
+
+
+        // Step 5: User think about it, still deny the offer
+        await insurance.connect(userSigner).denyOffer(requestId);
+
     });
     
 })
