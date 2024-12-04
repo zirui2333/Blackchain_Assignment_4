@@ -50,9 +50,9 @@ contract DecentralizedInsurance {
     mapping(uint => Company) public companies; // Mapping of company IDs to Company structs
     mapping(address => uint256) public companyIds; // Mapping of company addresses to their IDs
     mapping(address => Customer) public customers; // Mapping of customer addresses to Customer structs
+    mapping(bytes32 => bool) public bannedCompanyNames; // List of banned companies, bool is set to true if banned
    
     // ban list array of banned companies
-    uint[] public bannedCompanies;
     
    // Event emitted when a new insurance plan is created
     event PlanCreated(uint planId, uint companyId);
@@ -209,15 +209,6 @@ function payPremium(uint _planId) external payable {
         emit PlanCreated(nextPlanId, companyId);
         nextPlanId++;
     }
-    // true to pause plan, false to unpause
-    function changePlanStatus(uint _planId, bool _status) external {
-    	uint256 companyId = companyIds[msg.sender];
-    	require(companies[companyId].addr != address(0), "Not a registered company.");
-    	require(insurancePlans[_planId].companyId == companyId, "Not authorized.");
-    	require(insurancePlans[_planId].isActive != _status, "No change in status.");
-
-        insurancePlans[_planId].isActive = _status;
-    }
     // View all requests for a company
     function viewRequests() external view returns (Request[] memory) {
         uint count = 0;
@@ -307,16 +298,24 @@ function setPlatformFee(uint _fee) external {
     // Update the platform fee with the new value provided
     platformFee = _fee;
 }
+// true to pause plan, false to unpause
+function changePlanStatus(uint _planId, bool _status) external {
+    uint256 companyId = companyIds[msg.sender];
+    require(companies[companyId].addr != address(0), "Not a registered company.");
+    require(insurancePlans[_planId].companyId == companyId, "Not authorized.");
+    require(insurancePlans[_planId].isActive != _status, "No change in status.");
 
+    insurancePlans[_planId].isActive = _status;
+}
 function banParticipant(uint _companyId) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
 
-    // Retrieve the company's address before deletion
+    // Retrieve the company's info before deletion
+    string memory companyName = companies[_companyId].name;
     address companyAddress = companies[_companyId].addr;
 
-    // Add the companyId to the banned list
-    bannedCompanies.push(_companyId);
+    bannedCompanyNames[keccak256(abi.encodePacked(companyName))] = true;
 
     // Delete the company from the companies mapping
     delete companies[_companyId];
@@ -330,6 +329,8 @@ function banParticipant(uint _companyId) external {
 function registerCompany(string memory _name, uint _rate) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
+    // Ensure that this specific name isn't banned
+    require(!bannedCompanyNames[keccak256(abi.encodePacked(_name))], "Company name is banned.");
 
     // Check if the company name is already registered
     for (uint i = 1; i < nextCompanyId; i++) {
