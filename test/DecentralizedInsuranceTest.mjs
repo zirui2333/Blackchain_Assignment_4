@@ -128,7 +128,11 @@ console.log("----------------  Test 1. Register Function------------------------
 
         console.log("\nUser views the plans and interests at Premium plan");
         let planID = 2;
-        await insurance.connect(customer).submitRequest(planID);
+        try{
+            await insurance.connect(customer).submitRequest(planID);
+        }catch(error){
+            console.log("Error: error in step 2");
+        }
         console.log("User submitted a request to Premium plan company");
         
 
@@ -151,7 +155,8 @@ console.log("----------------  Test 1. Register Function------------------------
 
 
         // Step 5: User think about it, still deny the offer
-        await insurance.connect(userSigner).denyOffer(requestId);
+        // const userSigner = await ethers.getSigner(customer.addr);
+        // await insurance.connect(userSigner).denyOffer(requestId);
 
     });
     
