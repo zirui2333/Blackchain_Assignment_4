@@ -68,55 +68,76 @@ contract DecentralizedInsurance {
 }
 
     // CUSTOMER FUNCTIONS
-    function viewPlans() external view returns (InsurancePlan[] memory) {
-        InsurancePlan[] memory activePlans = new InsurancePlan[](
-            nextPlanId - 1
-        );
-        uint index = 0;
 
-        for (uint i = 1; i < nextPlanId; i++) {
-            if (insurancePlans[i].isActive) {
-                activePlans[index] = insurancePlans[i];
-                index++;
-            }
+function viewPlans() external view returns (InsurancePlan[] memory) {
+    // Create an array to hold active insurance plans
+    InsurancePlan[] memory activePlans = new InsurancePlan[](
+        nextPlanId - 1
+    );
+    uint index = 0;
+
+    // Iterate through all insurance plans
+    for (uint i = 1; i < nextPlanId; i++) {
+        // Check if the insurance plan is active
+        if (insurancePlans[i].isActive) {
+            // Add the active plan to the array
+            activePlans[index] = insurancePlans[i];
+            index++;
         }
-        return activePlans;
     }
+    // Return the array of active insurance plans
+    return activePlans;
+}
 
-    function submitRequest(uint _planId) external {
-        require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
+function submitRequest(uint _planId) external {
+    // Ensure the selected insurance plan is active
+    require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
 
-        requests[nextRequestId] = Request({
-            id: nextRequestId,
-            customer: msg.sender,
-            planId: _planId,
-            isApproved: false,
-            isClaimed: false,
-            claimAmount: 0
-        });
+    // Create a new insurance request for the customer
+    requests[nextRequestId] = Request({
+        id: nextRequestId,
+        customer: msg.sender,
+        planId: _planId,
+        isApproved: false,
+        isClaimed: false,
+        claimAmount: 0
+    });
 
-        emit RequestSubmitted(nextRequestId, msg.sender, _planId);
-        nextRequestId++;
-    }
+    // Emit an event indicating the request has been submitted
+    emit RequestSubmitted(nextRequestId, msg.sender, _planId);
+    // Increment the request ID counter
+    nextRequestId++;
+}
 
-    function denyOffer(uint _requestId) external {
-        Request storage req = requests[_requestId];
-        require(req.customer == msg.sender, "Not authorized.");
-        require(!req.isApproved, "Request already approved.");
-        req.isApproved = false;
-    }
+function denyOffer(uint _requestId) external {
+    // Retrieve the request from storage
+    Request storage req = requests[_requestId];
+    // Ensure the caller is the customer who made the request
+    require(req.customer == msg.sender, "Not authorized.");
+    // Ensure the request has not already been approved
+    require(!req.isApproved, "Request already approved.");
+    // Deny the offer by setting isApproved to false
+    req.isApproved = false;
+}
 
-    function payPremium(uint _planId) external payable {
-        InsurancePlan storage plan = insurancePlans[_planId];
-        require(plan.isActive, "Invalid plan.");
-        require(msg.value == plan.premium, "Incorrect premium amount.");
+function payPremium(uint _planId) external payable {
+    // Retrieve the insurance plan from storage
+    InsurancePlan storage plan = insurancePlans[_planId];
+    // Ensure the insurance plan is active
+    require(plan.isActive, "Invalid plan.");
+    // Ensure the sent amount matches the premium amount
+    require(msg.value == plan.premium, "Incorrect premium amount.");
 
-        uint fee = (msg.value * platformFee) / 100;
-        payable(companies[plan.companyId].addr).transfer(msg.value - fee); // Corrected transfer line
-        payable(admin).transfer(fee);
+    // Calculate the platform fee based on the premium
+    uint fee = (msg.value * platformFee) / 100;
+    // Transfer the premium minus the fee to the company's address
+    payable(companies[plan.companyId].addr).transfer(msg.value - fee); // Corrected transfer line
+    // Transfer the platform fee to the admin's address
+    payable(admin).transfer(fee);
 
-        emit PremiumPaid(_planId, msg.sender, msg.value);
-    }
+    // Emit an event indicating the premium has been paid
+    emit PremiumPaid(_planId, msg.sender, msg.value);
+}
 
     // COMPANY FUNCTIONS
     function createPlan(
