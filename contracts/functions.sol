@@ -271,6 +271,20 @@ function registerCompany(string memory _name, uint _rate) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
 
+
+    // Check if the company name is already registered
+    for (uint i = 1; i < nextCompanyId; i++) {
+        require(
+            // Strings in Solidity cannot be directly compared (companies[i].name == _name is not valid)
+            // So I think using keccak256 hashes the strings for better comparison.
+            keccak256(abi.encodePacked(companies[i].name)) != keccak256(abi.encodePacked(_name)), // If the hashes match, names should be identical
+            "Company name already registered."
+        );
+    }
+
+    // Check if the address is already associated with a company
+    require(companyIds[msg.sender] == 0, "Company address already registered.");
+
     // Register a new company and store it in the companies mapping
     companies[nextCompanyId] = Company({
         id: nextCompanyId,

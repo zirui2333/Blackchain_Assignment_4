@@ -43,6 +43,21 @@ console.log("----------------  Test 1. Register Function------------------------
     console.log("Company 2:", company2.name);
     console.log("\n");
 
+    // Admin attempts to register the same company again (should fail)
+    try {
+        console.log("Admin attempts to register the same company...");
+        await insurance.connect(admin).registerCompany("AdminCompany1", 10);
+    } catch (error) {
+        // Print the message that duplicate registration is not allowed
+        console.log("Error:", "Admin cannot register the same company twice");
+    }
+
+    // Ensure only two companies exist in the mapping
+    const totalCompanies = await insurance.companyCount();
+    console.log("Total registered companies:", totalCompanies.toString());
+    expect(totalCompanies).to.equal(2); // Should still be 2
+
+
     // Non-admin attempts to register a company (should fail)
     try {
         console.log("Non-admin attempts to create companies...");
@@ -51,8 +66,6 @@ console.log("----------------  Test 1. Register Function------------------------
         // Print the message that only admin can register a company
         console.log("Error:", "Non-admin cannot register account");
     }
-
-
     
 });
 
@@ -71,7 +84,6 @@ console.log("----------------  Test 1. Register Function------------------------
 6. The rate pass and Company send the request back with request amount (say 2000 ether)
 7. User accepts the offer
 */
-
 
 
    it("Should allow user to view plans, submit a request, and handle negotiation process", async function () {
@@ -159,5 +171,7 @@ console.log("----------------  Test 1. Register Function------------------------
         // await insurance.connect(userSigner).denyOffer(requestId);
 
     });
+
+    
     
 })
