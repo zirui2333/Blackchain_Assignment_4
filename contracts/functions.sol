@@ -307,7 +307,7 @@ function changePlanStatus(uint _planId, bool _status) external {
 
     insurancePlans[_planId].isActive = _status;
 }
-function banParticipant(uint _companyId) external {
+function banCompany(uint _companyId) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
 
