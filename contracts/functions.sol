@@ -76,7 +76,7 @@ contract DecentralizedInsurance {
 function registerCustomer(uint _rate) external {
     // Check if customer is registered
     require(!customers[msg.sender].isRegistered, "Customer already registered.");
-    // Register the customer
+    // Register the customer (they can self register)
     customers[msg.sender] = Customer({
         addr: msg.sender,
         rate: _rate,
@@ -241,6 +241,8 @@ function payPremium(uint _planId) external payable {
         // Add your statistical model here
         // Placeholder: assuming that if the customer has a rate above 10, they are deemed low risk
         return customers[req.customer].rate > 6;
+
+        // NOTE: WHAT HAPPENS IF CUSTOMER IS HIGH RISK?
     }
 
     // Approve or deny customer requests, with the option for counter-offers

@@ -72,13 +72,13 @@ console.log("----------------  Test 1. Register Function------------------------
 // ---------------------------  Test 2. User interacts with plans and requests  --------------------------------
 
 /* Scenario:
-1. Create 3 plans, conpany1 create 1 plan, company 2 creates 2 plans
-2. user pull up a list of plan and interest at one plan
-3. user sends a request to the company for that plan 
-4. company pull up the request
-5. company check the request and check the customer’s rate.
-6. The rate pass and Company send the request back with request amount (say 2000 ether)
-7. User accepts the offer
+1. Create 3 plans, company1 create 1 plan, company 2 creates 2 plans
+2. User pull up a list of plan and interest at one plan
+3. User sends a request to the company for that plan 
+4. Company pull up the request
+5. Company check the request and approces
+6. User accepts or denies offer
+7. If user accepts then they can register, if they deny do nothing
 */
 
 
@@ -158,17 +158,43 @@ console.log("----------------  Test 1. Register Function------------------------
         // Company approves request
         console.log("\nCompany 2 sees the request and approve the request");
         const requestId = company2Requests[0].id;
-        try{
-            await insurance.connect(company2Signer).Request_Negotiation(requestId, true, 0);
-        }catch(error){
-            console.log("Error in step 4")
-        }
+        console.log("Company 2 approved the request and sends offer!");
 
+        // try{
+        //     await insurance.connect(company2Signer).Request_Negotiation(requestId, true, 0);
+        // }catch(error){
+        //     console.log("Error in step 4")
+        // }
 
-        // Step 5: User think about it, still deny the offer
         // const userSigner = await ethers.getSigner(customer.addr);
         // await insurance.connect(userSigner).denyOffer(requestId);
 
+        console.log("\nUser reviews the offer");
+        const acceptOffer = true; // Depends on the userInput if true = accept/ false = deny
+
+
+        // NOTE: WHAT HAPPENS IF CUSTOMER IS HIGH RISK? WHEN SHOULD WE CHECK RATE?
+
+        if (acceptOffer) {
+            console.log("User accepts the offer");
+            await insurance.connect(customer).acceptOffer(requestId);
+
+            // User registers after accepting the offer
+            console.log("User registers as a customer");
+            await insurance.connect(customer).registerCustomer(8); // Constructor
+            const registeredCustomer = await insurance.customers(customer.address);
+            console.log(`Customer registered: ${registeredCustomer.addr}, Risk score: ${registeredCustomer.rate}`);
+            expect(registeredCustomer.isRegistered).to.be.true; //Check if customer is registered
+        } else {
+            console.log("User denies the offer");
+            await insurance.connect(customer).denyOffer(requestId);
+            // Ensure the user does not register after denial
+            const isRegistered = await insurance.customers(customer.address).isRegistered;
+            expect(isRegistered).to.be.false;
+            console.log("User did not register since the offer was denied");
+        }
+
+        console.log("Test case completed!");
     });
 
     
