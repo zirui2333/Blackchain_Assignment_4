@@ -2,60 +2,70 @@
 pragma solidity ^0.8.0;
 
 contract DecentralizedInsurance {
+    // Structure to represent an insurance plan
     struct InsurancePlan {
-        uint id;
-        uint companyId; // Changed from address to uint
-        string name;
-        string description;
-        uint premium;
-        uint coverageAmount;
-        uint duration;
-        bool isActive;
+        uint id; // Unique identifier for the insurance plan
+        uint companyId; // ID of the company offering the plan (changed from address to uint)
+        string name; // Name of the insurance plan
+        string description; // Description of the insurance coverage
+        uint premium; // Premium amount for the insurance plan
+        uint coverageAmount; // Coverage amount provided by the plan
+        uint duration; // Duration of the insurance plan in days
+        bool isActive; // Status to check if the plan is active
     }
 
+    // Structure to represent a customer's insurance request
     struct Request {
-        uint id;
-        address customer;
-        uint planId;
-        bool isApproved;
-        bool isClaimed;
-        uint claimAmount;
+        uint id; // Unique identifier for the request
+        address customer; // Address of the customer making the request
+        uint planId; // ID of the insurance plan requested
+        bool isApproved; // Approval status of the request by the company
+        bool isClaimed; // Status to check if a claim has been made on this request
+        uint claimAmount; // Amount claimed by the customer
     }
 
+    // Structure to represent an insurance company
     struct Company {
-        uint id;
-        address addr; // Using address for company
-        string name;
-        uint rate;
+        uint id; // Unique identifier for the company
+        address addr; // Ethereum address of the company
+        string name; // Name of the company
+        uint rate; // Rating or score of the company
     }
 
+    // Structure to represent a customer
     struct Customer {
-        address addr;
-        uint rate;
+        address addr; // Ethereum address of the customer
+        uint rate; // Rating or risk score of the customer
     }
 
-    uint private platformFee = 5; // 5% platform fee
-    address public admin; // Admin address
-    uint public nextCompanyId;
-    uint private nextPlanId = 1;
-    uint private nextRequestId = 1;
+    uint private platformFee = 5; // Platform fee percentage (5%)
+    address public admin; // Address of the platform administrator
+    uint public nextCompanyId; // Counter for assigning company IDs
+    uint private nextPlanId = 1; // Counter for assigning plan IDs
+    uint private nextRequestId = 1; // Counter for assigning request IDs
 
-    mapping(uint => InsurancePlan) public insurancePlans;
-    mapping(uint => Request) public requests;
-    mapping(uint => Company) public companies;
-    mapping(address => uint256) public companyIds; // Mapping companies by id
-    mapping(address => Customer) public customers;
+    mapping(uint => InsurancePlan) public insurancePlans; // Mapping of plan IDs to InsurancePlan structs
+    mapping(uint => Request) public requests; // Mapping of request IDs to Request structs
+    mapping(uint => Company) public companies; // Mapping of company IDs to Company structs
+    mapping(address => uint256) public companyIds; // Mapping of company addresses to their IDs
+    mapping(address => Customer) public customers; // Mapping of customer addresses to Customer structs
 
+    // Event emitted when a new insurance plan is created
     event PlanCreated(uint planId, uint companyId);
+    // Event emitted when a customer submits a request
     event RequestSubmitted(uint requestId, address customer, uint planId);
+    // Event emitted when a company responds to a request
     event RequestResponded(uint requestId, bool isApproved);
+    // Event emitted when a customer pays the premium
     event PremiumPaid(uint planId, address customer, uint amount);
+    // Event emitted when a claim is settled
     event ClaimSettled(uint requestId, uint claimAmount);
 
     constructor() {
         admin = msg.sender; // Set the contract deployer as the admin
-        nextCompanyId = 1; // Start with company id 1
+        nextCompanyId = 1; // Start company IDs from 1
     }
+}
 
     // CUSTOMER FUNCTIONS
     function viewPlans() external view returns (InsurancePlan[] memory) {
