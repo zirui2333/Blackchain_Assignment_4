@@ -51,8 +51,8 @@ contract DecentralizedInsurance {
     mapping(address => uint256) public companyIds; // Mapping of company addresses to their IDs
     mapping(address => Customer) public customers; // Mapping of customer addresses to Customer structs
     mapping(bytes32 => bool) public bannedCompanyNames; // List of banned companies, bool is set to true if banned
-       
-   // Event emitted when a new insurance plan is created
+
+    // Event emitted when a new insurance plan is created
     event PlanCreated(uint planId, uint companyId);
     // Event emitted when a customer submits a request
     event RequestSubmitted(uint requestId, address customer, uint planId);
@@ -70,113 +70,114 @@ contract DecentralizedInsurance {
         admin = msg.sender; // Set the contract deployer as the admin
         nextCompanyId = 1; // Start company IDs from 1
     }
-}
 
-// CUSTOMER FUNCTIONS
+    // CUSTOMER FUNCTIONS
 
-function registerCustomer(uint _rate) external {
-    // Check if customer is registered
-    require(!customers[msg.sender].isRegistered, "Customer already registered.");
-    // Register the customer (they can self register)
-    customers[msg.sender] = Customer({
-        addr: msg.sender,
-        rate: _rate,
-        isRegistered: true
-    });
-    // Emit event
-    emit CustomerRegistered(msg.sender, _rate);
-}
-
-function viewPlans() external view returns (InsurancePlan[] memory) {
-    // Create an array to hold active insurance plans
-    InsurancePlan[] memory activePlans = new InsurancePlan[](
-        nextPlanId - 1
-    );
-    uint index = 0;
-
-    // Iterate through all insurance plans
-    for (uint i = 1; i < nextPlanId; i++) {
-        // Check if the insurance plan is active
-        if (insurancePlans[i].isActive) {
-            // Add the active plan to the array
-            activePlans[index] = insurancePlans[i];
-            index++;
-        }
+    function registerCustomer(uint _rate) external {
+        // Check if customer is registered
+        require(
+            !customers[msg.sender].isRegistered,
+            "Customer already registered."
+        );
+        // Register the customer (they can self register)
+        customers[msg.sender] = Customer({
+            addr: msg.sender,
+            rate: _rate,
+            isRegistered: true
+        });
+        // Emit event
+        emit CustomerRegistered(msg.sender, _rate);
     }
-    // Return the array of active insurance plans
-    return activePlans;
-}
 
-function submitRequest(uint _planId) external {
-    // Ensure the selected insurance plan is active
-    require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
-    require(customers[msg.sender].isRegistered, "Customer not registered.");
+    function viewPlans() external view returns (InsurancePlan[] memory) {
+        // Create an array to hold active insurance plans
+        InsurancePlan[] memory activePlans = new InsurancePlan[](
+            nextPlanId - 1
+        );
+        uint index = 0;
 
-    // Create a new insurance request for the customer
-    requests[nextRequestId] = Request({
-        id: nextRequestId,
-        customer: msg.sender,
-        planId: _planId,
-        isApproved: false,
-        isClaimed: false,
-        claimAmount: 0
-    });
+        // Iterate through all insurance plans
+        for (uint i = 1; i < nextPlanId; i++) {
+            // Check if the insurance plan is active
+            if (insurancePlans[i].isActive) {
+                // Add the active plan to the array
+                activePlans[index] = insurancePlans[i];
+                index++;
+            }
+        }
+        // Return the array of active insurance plans
+        return activePlans;
+    }
 
-    // Emit an event indicating the request has been submitted
-    emit RequestSubmitted(nextRequestId, msg.sender, _planId);
-    // Increment the request ID counter
-    nextRequestId++;
-}
+    function submitRequest(uint _planId) external {
+        // Ensure the selected insurance plan is active
+        require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
+        require(customers[msg.sender].isRegistered, "Customer not registered.");
 
-function denyOffer(uint _requestId) external {
-    // Retrieve the request from storage
-    Request storage req = requests[_requestId];
-    // Ensure the caller is the customer who made the request
-    require(req.customer == msg.sender, "Not authorized.");
-    // Ensure the request has not already been approved
-    require(!req.isApproved, "Request already approved.");
-    // Ensure the request has been approved by the company
-    require(req.isApproved, "Request is not approved.");
-    // Deny the offer by setting isApproved to false
-    req.isApproved = false;
-}
+        // Create a new insurance request for the customer
+        requests[nextRequestId] = Request({
+            id: nextRequestId,
+            customer: msg.sender,
+            planId: _planId,
+            isApproved: false,
+            isClaimed: false,
+            claimAmount: 0
+        });
 
-function acceptOffer(uint _requestId) external {
-    Request storage req = requests[_requestId];
-    // Ensure the caller is the customer who made the request
-    require(req.customer == msg.sender, "Not authorized.");
-    // Ensure the request has been approved by the company
-    require(req.isApproved, "Request is not approved.");
-    // Ensure no claim has already been made on this request
-    require(!req.isClaimed, "Request already claimed.");
-    // Accept the offer by setting isApproved to true
-    req.isClaimed = true;
+        // Emit an event indicating the request has been submitted
+        emit RequestSubmitted(nextRequestId, msg.sender, _planId);
+        // Increment the request ID counter
+        nextRequestId++;
+    }
 
-    // Set the claim amount to the approved amount
-    require(req.claimAmount > 0, "Invalid claim amount.");
+    function denyOffer(uint _requestId) external {
+        // Retrieve the request from storage
+        Request storage req = requests[_requestId];
+        // Ensure the caller is the customer who made the request
+        require(req.customer == msg.sender, "Not authorized.");
+        // Ensure the request has not already been approved
+        require(!req.isApproved, "Request already approved.");
+        // Ensure the request has been approved by the company
+        require(req.isApproved, "Request is not approved.");
+        // Deny the offer by setting isApproved to false
+        req.isApproved = false;
+    }
 
-    payable(req.customer).transfer(req.claimAmount); // Not sure how to check this yet
-}
+    function acceptOffer(uint _requestId) external {
+        Request storage req = requests[_requestId];
+        // Ensure the caller is the customer who made the request
+        require(req.customer == msg.sender, "Not authorized.");
+        // Ensure the request has been approved by the company
+        require(req.isApproved, "Request is not approved.");
+        // Ensure no claim has already been made on this request
+        require(!req.isClaimed, "Request already claimed.");
+        // Accept the offer by setting isApproved to true
+        req.isClaimed = true;
 
+        // Set the claim amount to the approved amount
+        require(req.claimAmount > 0, "Invalid claim amount.");
 
-function payPremium(uint _planId) external payable {
-    // Retrieve the insurance plan from storage
-    InsurancePlan storage plan = insurancePlans[_planId];
-    // Ensure the insurance plan is active
-    require(plan.isActive, "Invalid plan.");
-    // Ensure the sent amount matches the premium amount
-    require(msg.value == plan.premium, "Incorrect premium amount.");
+        payable(req.customer).transfer(req.claimAmount); // Not sure how to check this yet
+    }
 
-    // Calculate the platform fee based on the premium
-    uint fee = (msg.value * platformFee) / 100;
-    // Transfer the premium minus the fee to the company's address
-    payable(companies[plan.companyId].addr).transfer(msg.value - fee); // Corrected transfer line
-    // Transfer the platform fee to the admin's address
-    payable(admin).transfer(fee);
+    function payPremium(uint _planId) external payable {
+        // Retrieve the insurance plan from storage
+        InsurancePlan storage plan = insurancePlans[_planId];
+        // Ensure the insurance plan is active
+        require(plan.isActive, "Invalid plan.");
+        // Ensure the sent amount matches the premium amount
+        require(msg.value == plan.premium, "Incorrect premium amount.");
 
-    // Emit an event indicating the premium has been paid
-    emit PremiumPaid(_planId, msg.sender, msg.value);
-}
+        // Calculate the platform fee based on the premium
+        uint fee = (msg.value * platformFee) / 100;
+        // Transfer the premium minus the fee to the company's address
+        payable(companies[plan.companyId].addr).transfer(msg.value - fee); // Corrected transfer line
+        // Transfer the platform fee to the admin's address
+        payable(admin).transfer(fee);
+
+        // Emit an event indicating the premium has been paid
+        emit PremiumPaid(_planId, msg.sender, msg.value);
+    }
 
     // COMPANY FUNCTIONS
     function createPlan(
@@ -191,7 +192,6 @@ function payPremium(uint _planId) external payable {
             companies[companyId].addr != address(0),
             "Not a registered company."
         );
-        
 
         insurancePlans[nextPlanId] = InsurancePlan({
             id: nextPlanId,
@@ -256,9 +256,18 @@ function payPremium(uint _planId) external payable {
     // true to pause plan, false to unpause
     function changePlanStatus(uint _planId, bool _status) external {
         uint256 companyId = companyIds[msg.sender];
-        require(companies[companyId].addr != address(0), "Not a registered company.");
-        require(insurancePlans[_planId].companyId == companyId, "Not authorized.");
-        require(insurancePlans[_planId].isActive != _status, "No change in status.");
+        require(
+            companies[companyId].addr != address(0),
+            "Not a registered company."
+        );
+        require(
+            insurancePlans[_planId].companyId == companyId,
+            "Not authorized."
+        );
+        require(
+            insurancePlans[_planId].isActive != _status,
+            "No change in status."
+        );
 
         insurancePlans[_planId].isActive = _status;
     }
@@ -284,75 +293,83 @@ function payPremium(uint _planId) external payable {
         emit ClaimSettled(_requestId, claimAmount);
     }
 
-// ADMIN FUNCTIONS
+    // ADMIN FUNCTIONS
 
-function setPlatformFee(uint _fee) external {
-    // Ensure that only the admin can call this function
-    require(msg.sender == admin, "Only admin.");
-    // Update the platform fee with the new value provided
-    platformFee = _fee;
-}
-function unbanCompany(string memory _name) external {
-    // Ensure only the admin can call this function
-    require(msg.sender == admin, "Only admin.");
-
-    // Hash the company name to use as the key for banned names
-    bytes32 nameHash = keccak256(abi.encodePacked(_name));
-
-    // Ensure the company is currently banned
-    require(bannedCompanyNames[nameHash], "Company is not banned.");
-
-    // Remove the company from the banned list
-    bannedCompanyNames[nameHash] = false;
-}
-function banCompany(uint _companyId) external {
-    // Ensure that only the admin can call this function
-    require(msg.sender == admin, "Only admin.");
-
-    // Retrieve the company's info before deletion
-    string memory companyName = companies[_companyId].name;
-    address companyAddress = companies[_companyId].addr;
-
-    bannedCompanyNames[keccak256(abi.encodePacked(companyName))] = true;
-
-    // Delete the company from the companies mapping
-    delete companies[_companyId];
-
-    // Delete the customer associated with the company's address
-    if (companyAddress != address(0)) {
-        delete customers[companyAddress];
+    function setPlatformFee(uint _fee) external {
+        // Ensure that only the admin can call this function
+        require(msg.sender == admin, "Only admin.");
+        // Update the platform fee with the new value provided
+        platformFee = _fee;
     }
-}
+    function unbanCompany(string memory _name) external {
+        // Ensure only the admin can call this function
+        require(msg.sender == admin, "Only admin.");
 
-function registerCompany(string memory _name, uint _rate) external {
-    // Ensure that only the admin can call this function
-    require(msg.sender == admin, "Only admin.");
-    // Ensure that this specific name isn't banned
-    require(bannedCompanyNames[keccak256(abi.encodePacked(_name))], "Company name is banned.");
+        // Hash the company name to use as the key for banned names
+        bytes32 nameHash = keccak256(abi.encodePacked(_name));
 
-    // Check if the company name is already registered
-    for (uint i = 1; i < nextCompanyId; i++) {
+        // Ensure the company is currently banned
+        require(bannedCompanyNames[nameHash], "Company is not banned.");
+
+        // Remove the company from the banned list
+        bannedCompanyNames[nameHash] = false;
+    }
+    function banCompany(uint _companyId) external {
+        // Ensure that only the admin can call this function
+        require(msg.sender == admin, "Only admin.");
+
+        // Retrieve the company's info before deletion
+        string memory companyName = companies[_companyId].name;
+        address companyAddress = companies[_companyId].addr;
+
+        bannedCompanyNames[keccak256(abi.encodePacked(companyName))] = true;
+
+        // Delete the company from the companies mapping
+        delete companies[_companyId];
+
+        // Delete the customer associated with the company's address
+        if (companyAddress != address(0)) {
+            delete customers[companyAddress];
+        }
+    }
+
+    function registerCompany(string memory _name, uint _rate) external {
+        // Ensure that only the admin can call this function
+        require(msg.sender == admin, "Only admin.");
+        // Ensure that this specific name isn't banned
         require(
-            // Strings in Solidity cannot be directly compared (companies[i].name == _name is not valid)
-            // So I think using keccak256 hashes the strings for better comparison.
-            keccak256(abi.encodePacked(companies[i].name)) != keccak256(abi.encodePacked(_name)), // If the hashes match, names should be identical
-            "Company name already registered."
+            !bannedCompanyNames[keccak256(abi.encodePacked(_name))],
+            "Company name is banned."
         );
+
+        // Check if the company name is already registered
+        for (uint i = 1; i < nextCompanyId; i++) {
+            require(
+                // Strings in Solidity cannot be directly compared (companies[i].name == _name is not valid)
+                // So I think using keccak256 hashes the strings for better comparison.
+                keccak256(abi.encodePacked(companies[i].name)) !=
+                    keccak256(abi.encodePacked(_name)), // If the hashes match, names should be identical
+                "Company name already registered."
+            );
+        }
+
+        // Check if the address is already associated with a company
+        // require(
+        //     companyIds[msg.sender] == 0,
+        //     "Company address already registered."
+        // );
+
+        // Register a new company and store it in the companies mapping
+        companies[nextCompanyId] = Company({
+            id: nextCompanyId,
+            addr: msg.sender, // Address of the company owner (or admin registering the company)
+            name: _name,
+            customer_rating: _rate
+        });
+
+        // Map the company's address to its company ID
+        companyIds[msg.sender] = nextCompanyId;
+        // Increment to the next company ID for future registrations
+        nextCompanyId++; // Increment to the next company id
     }
-
-    // Check if the address is already associated with a company
-    require(companyIds[msg.sender] == 0, "Company address already registered.");
-
-    // Register a new company and store it in the companies mapping
-    companies[nextCompanyId] = Company({
-        id: nextCompanyId,
-        addr: msg.sender, // Address of the company owner (or admin registering the company)
-        name: _name,
-        customer_rating: _rate
-    });
-
-    // Map the company's address to its company ID
-    companyIds[msg.sender] = nextCompanyId;
-    // Increment to the next company ID for future registrations
-    nextCompanyId++; // Increment to the next company id
 }
