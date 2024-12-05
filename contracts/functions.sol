@@ -233,18 +233,6 @@ function payPremium(uint _planId) external payable {
         }
         return companyRequests;
     }
-
-    // Evaluate Customer (stub function)
-    function evaluateCustomer(uint _requestId) external view returns (bool) {
-        Request storage req = requests[_requestId];
-        require(req.customer != address(0), "Request does not exist.");
-        // Add your statistical model here
-        // Placeholder: assuming that if the customer has a rate above 10, they are deemed low risk
-        return customers[req.customer].rate > 6;
-
-        // NOTE: WHAT HAPPENS IF CUSTOMER IS HIGH RISK?
-    }
-
     // Approve or deny customer requests, with the option for counter-offers
     function Request_Negotiation(
         uint _requestId,
