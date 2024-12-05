@@ -72,7 +72,7 @@ contract DecentralizedInsurance {
     }
 }
 
-    // CUSTOMER FUNCTIONS
+// CUSTOMER FUNCTIONS
 
 function registerCustomer(uint _rate) external {
     // Check if customer is registered
@@ -265,7 +265,15 @@ function payPremium(uint _planId) external payable {
 
         emit RequestResponded(_requestId, _approve);
     }
+    // true to pause plan, false to unpause
+    function changePlanStatus(uint _planId, bool _status) external {
+        uint256 companyId = companyIds[msg.sender];
+        require(companies[companyId].addr != address(0), "Not a registered company.");
+        require(insurancePlans[_planId].companyId == companyId, "Not authorized.");
+        require(insurancePlans[_planId].isActive != _status, "No change in status.");
 
+        insurancePlans[_planId].isActive = _status;
+    }
     // Settle claims if conditions are met
     function settleClaim(uint _requestId) external {
         Request storage req = requests[_requestId];
@@ -288,22 +296,13 @@ function payPremium(uint _planId) external payable {
         emit ClaimSettled(_requestId, claimAmount);
     }
 
-  // ADMIN FUNCTIONS
+// ADMIN FUNCTIONS
 
 function setPlatformFee(uint _fee) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
     // Update the platform fee with the new value provided
     platformFee = _fee;
-}
-// true to pause plan, false to unpause
-function changePlanStatus(uint _planId, bool _status) external {
-    uint256 companyId = companyIds[msg.sender];
-    require(companies[companyId].addr != address(0), "Not a registered company.");
-    require(insurancePlans[_planId].companyId == companyId, "Not authorized.");
-    require(insurancePlans[_planId].isActive != _status, "No change in status.");
-
-    insurancePlans[_planId].isActive = _status;
 }
 function unbanCompany(string memory _name) external {
     // Ensure only the admin can call this function
@@ -341,7 +340,7 @@ function registerCompany(string memory _name, uint _rate) external {
     // Ensure that only the admin can call this function
     require(msg.sender == admin, "Only admin.");
     // Ensure that this specific name isn't banned
-    require(!bannedCompanyNames[keccak256(abi.encodePacked(_name))], "Company name is banned.");
+    require(bannedCompanyNames[keccak256(abi.encodePacked(_name))], "Company name is banned.");
 
     // Check if the company name is already registered
     for (uint i = 1; i < nextCompanyId; i++) {
