@@ -23,8 +23,9 @@ describe("DecentralizedInsurance Contract", function () {
 
 
 
-// --------------------------------  Test 1. Register Function----------------------------------------
+// --------------------------  Test 1. Register / Ban / Unban company Function---------------------------------
 // Only admin can register company, others can't
+// Only admin cna ban and unban company
 
 console.log("----------------  Test 1. Register Function-------------------------");
 
@@ -47,8 +48,8 @@ console.log("----------------  Test 1. Register Function------------------------
     // Check if both companies are correctly registered and print their names
     console.log("Admin attempts to create companies...");
     console.log("Name printed: ");
-    console.log("Company 1:", company1.name);
-    console.log("Company 2:", company2.name);
+    console.log(`Company 1: ${company1.name}, ID: ${company1.id}`);
+    console.log(`Company 2: ${company2.name}, ID: ${company2.id}`);
     console.log("\n");
 
     // Admin attempts to register the same company again (should fail)
@@ -57,7 +58,7 @@ console.log("----------------  Test 1. Register Function------------------------
         await insurance.connect(admin).registerCompany("AdminCompany1", 10);
     } catch (error) {
         // Print the message that duplicate registration is not allowed
-        console.log("Error:", "Admin cannot register the same company twice");
+        console.log("Error:", "Admin cannot register the same company twice \n");
     }
 
     // Non-admin attempts to register a company (should fail)
@@ -66,10 +67,25 @@ console.log("----------------  Test 1. Register Function------------------------
         await insurance.connect(nonAdmin).registerCompany("NonAdminCompany", 20);
     } catch (error) {
         // Print the message that only admin can register a company
-        console.log("Error:", "Non-admin cannot register account");
+        console.log("Error:", "Non-admin cannot register account \n");
+    }
+
+
+    // Admin ban a company
+    try{
+        let company_id = company1.id;
+        await insurance.connect(admin).banCompany(company_id);
+        console.log("Admin deletes a company.");
+        
+    }catch(error){
+        console.log(error);
     }
     
+
 });
+
+
+
 
 // ---------------------------  Test 2. User interacts with plans and requests  --------------------------------
 
@@ -131,8 +147,14 @@ console.log("----------------  Test 1. Register Function------------------------
         console.log("Ultimate plan and premium plan created!");
 
 
+        const customer1 = await insurance.connect(customer).registerCustomer("John", 6);
+        const customer2 = await insurance.connect(customer).registerCustomer("Amy", 6);
+
+        const customer1Signer = await ethers.getSigner(customer1.addr); 
+        const customer2Signer = await ethers.getSigner(customer2.addr);
+
         // User view plan and sumbit request
-        const plans = await insurance.viewPlans();
+        const plans = await insurance.connect(customer1Signer).viewPlans();
         console.log("\nList of Plans:");
         for (let i = 0; i < plans.length; i++) {
             console.log(`Plan`, i + 1, `: `, plans[i].name, `(`, ethers.utils.formatEther(plans[i].premium), `ETH)`);
@@ -140,9 +162,10 @@ console.log("----------------  Test 1. Register Function------------------------
 
         // User selects plan and submits request
         console.log("\nUser views the plans and interests at Premium plan");
+        const customer_name = "John";
         let planID = 2;  // Premium plan ID = 2
         try{
-            await insurance.connect(customer).submitRequest(planID);
+            await insurance.connect(customer1Signer).submitRequest(customer_name, planID);
         }catch(error){
             console.log("Error: error in step 2: ", error);
         }
@@ -162,11 +185,11 @@ console.log("----------------  Test 1. Register Function------------------------
         // const requestId = company2Requests[0].id;
         console.log("Company 2 approved the request and sends offer!");
 
-        // try{
-        //     await insurance.connect(company2Signer).Request_Negotiation(requestId, true, 0);
-        // }catch(error){
-        //     console.log("Error in step 4")
-        // }
+        try{
+            await insurance.connect(company2Signer).Request_Negotiation(requestId, true, 0);
+        }catch(error){
+            console.log("Error in step 4")
+        }
 
         // const userSigner = await ethers.getSigner(customer.addr);
         // await insurance.connect(userSigner).denyOffer(requestId);

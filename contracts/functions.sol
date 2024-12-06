@@ -35,6 +35,7 @@ contract DecentralizedInsurance {
     // Structure to represent a customer
     struct Customer {
         address addr; // Ethereum address of the customer
+        string name;
         uint rate; // Rating or risk score of the customer
         bool isRegistered; //Check to see if customer is added
     }
@@ -49,8 +50,8 @@ contract DecentralizedInsurance {
     mapping(uint => Request) public requests; // Mapping of request IDs to Request structs
     mapping(uint => Company) public companies; // Mapping of company IDs to Company structs
     mapping(address => uint256) public companyIds; // Mapping of company addresses to their IDs
-    mapping(address => Customer) public customers; // Mapping of customer addresses to Customer structs
-    mapping(bytes32 => bool) public bannedCompanyNames; // List of banned companies, bool is set to true if banned
+    mapping(string => Customer) public customers; // Mapping of customer addresses to Customer structs
+    mapping(string => bool) public bannedCompanyNames; // List of banned companies, bool is set to true if banned
 
     // Event emitted when a new insurance plan is created
     event PlanCreated(uint planId, uint companyId);
@@ -73,20 +74,38 @@ contract DecentralizedInsurance {
 
     // CUSTOMER FUNCTIONS
 
-    function registerCustomer(uint _rate) external {
-        // Check if customer is registered
+
+
+    modifier adminCheck() {
+        require(msg.sender == admin, "Only admin.");
+        _;
+    }
+
+    function registerCustomer(
+        string memory _name,
+        uint _rate
+    ) external{
+        // Register the customer (they can self register)
         require(
-            !customers[msg.sender].isRegistered,
+            !customers[_name].isRegistered,
             "Customer already registered."
         );
-        // Register the customer (they can self register)
-        customers[msg.sender] = Customer({
+        customers[_name] = Customer({
             addr: msg.sender,
+            name: _name,
             rate: _rate,
             isRegistered: true
         });
         // Emit event
         emit CustomerRegistered(msg.sender, _rate);
+    }
+
+    function getCustomer(string memory _name) public view returns (Customer memory){
+        require(
+            !customers[_name].isRegistered,
+            "Customer already registered."
+        );
+        return customers[_name];
     }
 
     function viewPlans() external view returns (InsurancePlan[] memory) {
@@ -109,10 +128,16 @@ contract DecentralizedInsurance {
         return activePlans;
     }
 
-    function submitRequest(uint _planId) external {
+    function submitRequest(
+        string memory name_,
+        uint _planId
+    ) external{
+        require(
+            customers[name_].isRegistered,
+            "Customer not registered."
+        );
         // Ensure the selected insurance plan is active
         require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
-        require(customers[msg.sender].isRegistered, "Customer not registered.");
 
         // Create a new insurance request for the customer
         requests[nextRequestId] = Request({
@@ -305,14 +330,11 @@ contract DecentralizedInsurance {
         // Ensure only the admin can call this function
         require(msg.sender == admin, "Only admin.");
 
-        // Hash the company name to use as the key for banned names
-        bytes32 nameHash = keccak256(abi.encodePacked(_name));
-
         // Ensure the company is currently banned
-        require(bannedCompanyNames[nameHash], "Company is not banned.");
+        require(bannedCompanyNames[_name], "Company is not banned.");
 
         // Remove the company from the banned list
-        bannedCompanyNames[nameHash] = false;
+        bannedCompanyNames[_name] = false;
     }
     function banCompany(uint _companyId) external {
         // Ensure that only the admin can call this function
@@ -322,15 +344,10 @@ contract DecentralizedInsurance {
         string memory companyName = companies[_companyId].name;
         address companyAddress = companies[_companyId].addr;
 
-        bannedCompanyNames[keccak256(abi.encodePacked(companyName))] = true;
+        bannedCompanyNames[companyName] = true;
 
         // Delete the company from the companies mapping
         delete companies[_companyId];
-
-        // Delete the customer associated with the company's address
-        if (companyAddress != address(0)) {
-            delete customers[companyAddress];
-        }
     }
 
     function registerCompany(string memory _name, uint _rate) external {
@@ -338,7 +355,7 @@ contract DecentralizedInsurance {
         require(msg.sender == admin, "Only admin.");
         // Ensure that this specific name isn't banned
         require(
-            !bannedCompanyNames[keccak256(abi.encodePacked(_name))],
+            !bannedCompanyNames[_name],
             "Company name is banned."
         );
 
