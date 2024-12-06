@@ -331,7 +331,7 @@ contract DecentralizedInsurance {
         require(msg.sender == admin, "Only admin.");
 
         // Ensure the company is currently banned
-        require(bannedCompanyNames[_name], "Company is not banned.");
+        require(!bannedCompanyNames[_name], "Company is not banned.");
 
         // Remove the company from the banned list
         bannedCompanyNames[_name] = false;
@@ -340,6 +340,7 @@ contract DecentralizedInsurance {
         // Ensure that only the admin can call this function
         require(msg.sender == admin, "Only admin.");
 
+        
         // Retrieve the company's info before deletion
         string memory companyName = companies[_companyId].name;
         address companyAddress = companies[_companyId].addr;

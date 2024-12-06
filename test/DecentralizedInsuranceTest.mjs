@@ -72,16 +72,33 @@ console.log("----------------  Test 1. Register Function------------------------
 
 
     // Admin ban a company
+    let company_id = company1.id;
     try{
-        let company_id = company1.id;
         await insurance.connect(admin).banCompany(company_id);
         console.log("Admin deletes a company.");
-        
+
     }catch(error){
         console.log(error);
     }
-    
 
+    // Admin unban a company 
+    try{
+        await insurance.connect(admin).unbanCompany(company_id);
+        console.log("Admin restore a company");
+
+    }catch(error){
+        console.log(error);
+    }
+
+    // Admin unban a company that is currently unbanned
+    company_id = company2.id;
+    try{
+        await insurance.connect(admin).unbanCompany(company_id);
+        console.log("Admin restore an active company, this shouldnt happen");
+
+    }catch(error){
+        console.log(error);
+    }
 });
 
 
