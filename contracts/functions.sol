@@ -98,7 +98,7 @@ contract DecentralizedInsurance {
     function getCustomer(
         string memory _name
     ) public view returns (Customer memory) {
-        require(!customers[_name].isRegistered, "Customer already registered.");
+        require(customers[_name].isRegistered, "Customer is not registered.");
         return customers[_name];
     }
 
