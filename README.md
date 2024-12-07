@@ -21,24 +21,29 @@ The Insurance Trading System is a blockchain-based platform designed to enhance 
 
 ## Key Purposes:
 
+### Public Functions
+
+1. `getCustomer`: Customer info
+2. `viewPlans`: List the current active plans
+
 ### For Customers
 
-1. `View Insurance Plans`: Customers can view a list of available insurance plans with details like coverage, premium, duration, and provider (company) name.
-2. `Request Insurance`: Submit a request for insurance.
-3. `Deny Offers`: Deny offers provided by the insurance company.
-4. `Pay Premium`: Securely transfer funds for accepted insurance agreements.
-5. `Claim Submission`: Submit claims to request the claim settlements
+1. `RegisterCustomer`: Customers can register an account
+2. `SubmitRequest`: Submit a request for insurance.
+3. `DenyOffers`: Deny offers provided by the insurance company.
+4. `AcceptOffer`: Accept offers provided by the insurance company.
+5. `Pay Premium`: Securely transfer funds for accepted insurance agreements.
 
 ### For Companies
 
 1. `View Requests`: List insurance requests from customers.
-2. `Evaluate Customer`: using historical data and statistical models to predict the likelihood of a future claim
-3. `Create Plans`: Add or modify insurance plans they offer.
-4. `Request Negotiation`: Approve or deny requests and could provide counter-offers.
-5. `Claim Settlement`: Verify and settle claims submitted by customers if insurance conditions are met.
+2. `CreatePlans`: Add or modify insurance plans they offer.
+3. `Request_decision_By_Company`: Approve or deny requests.
+4. `SettleClaim`: Verify and settle claims submitted by customers if insurance conditions are met.
 
 ### Platform Administrators (Organization)
 
-1. `Charge Fees`: Automatically deduct a platform fee for every successful transaction.
-2. `Ban Participants`: Remove users or companies who violate the platform's rules.
-3. `registerCompany` : Register for new companies
+1. `SetPlatformFee`: Automatically deduct a platform fee for every successful transaction.
+2. `Ban Company`: Remove companies who violate the platform's rules.
+3. `Unban Company`: Restore companies who violate the platform's rules.
+4. `registerCompany` : Register for new companies

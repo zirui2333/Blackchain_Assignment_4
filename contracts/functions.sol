@@ -32,6 +32,7 @@ contract DecentralizedInsurance {
         address addr; // Ethereum address of the company
         string name; // Name of the company
         uint customer_rating; // Rating or score of the company
+        bool isActive; //Check if company is banned or not;
     }
 
     // Structure to represent a customer
@@ -354,7 +355,7 @@ contract DecentralizedInsurance {
         bannedCompanyNames[companyName] = true;
 
         // Delete the company from the companies mapping
-        delete companies[_companyId];
+        companies[_companyId].isActive = false;
     }
 
     function registerCompany(string memory _name, uint _rate) external {
@@ -385,6 +386,7 @@ contract DecentralizedInsurance {
             id: nextCompanyId,
             addr: msg.sender, // Address of the company owner (or admin registering the company)
             name: _name,
+            isActive: true,
             customer_rating: _rate
         });
 
