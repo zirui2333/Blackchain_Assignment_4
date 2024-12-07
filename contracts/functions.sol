@@ -102,6 +102,7 @@ contract DecentralizedInsurance {
             // Access control: Only the customer themselves or the admin can retrieve details
         require(
             msg.sender == customers[_name].addr || msg.sender == admin,
+            "Not authorized to view customer details." // Throws error if not authorized
         );
     }
 
@@ -195,6 +196,9 @@ contract DecentralizedInsurance {
         require(plan.isActive, "Invalid plan.");
         // Ensure the sent amount matches the premium amount
         require(msg.value == plan.premium, "Incorrect premium amount.");
+        // Ensures it maps to a valid company
+        require(companies[plan.companyId].addr != address(0), "Invalid company."); 
+
 
         // Calculate the platform fee based on the premium
         uint fee = (msg.value * platformFee) / 100;
