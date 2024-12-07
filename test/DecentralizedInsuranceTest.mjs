@@ -27,7 +27,7 @@ describe("DecentralizedInsurance Contract", function () {
 // Only admin can register company, others can't
 // Only admin cna ban and unban company
 
-console.log("----------------  Test 1. Register Function-------------------------");
+console.log("----------------  Test 1. Register Function-------------------------");    
 
   it("Should allow only admin to register a company", async function () {
     await insurance.connect(admin).registerCompany("AdminCompany1", 10);
@@ -250,6 +250,48 @@ console.log("----------------  Test 1. Register Function------------------------
     
 })
 
+// -------------------------- Test 3: getCustomer Function Test ----------------------------------
+
+it("Should return the correct customer details and handle access control", async function () {
+    console.log("----------------  Test 3: getCustomer Function Test -------------------------");
+
+    // Register a customer
+    await insurance.connect(customer).registerCustomer("Chill Guy", 50);
+    console.log("Customer registered: Chill Guy");
+
+    // Retrieve the customer details
+    const customerDetails = await insurance.getCustomer("Chill Guy");
+
+    // Log and check if the details are correct
+    console.log("Retrieved customer details:", {
+      addr: customerDetails.addr,
+      name: customerDetails.name,
+      rate: customerDetails.rate,
+      isRegistered: customerDetails.isRegistered,
+    });
+
+    expect(customerDetails.addr).to.equal(customer.address);
+    expect(customerDetails.name).to.equal("Chill Guy");
+    expect(customerDetails.rate).to.equal(50);
+    expect(customerDetails.isRegistered).to.be.true;
+
+    // Non-admin tries to access customer details
+    try {
+      await insurance.connect(nonAdmin).getCustomer("Chill Guy");
+    } catch (error) {
+      console.log("Unauthorized access attempt by non-admin:", error.message);
+      expect(error.message).to.include("Not authorized to view customer details.");
+    }
+
+    // Admin retrieves customer details
+    const adminAccess = await insurance.connect(admin).getCustomer("Chill Guy");
+    console.log("Admin successfully retrieved customer details:", adminAccess.name);
+    expect(adminAccess.name).to.equal("Chill Guy");
+  });
+
+
+
+// -------------------------- Helper Function: Log Company Requests --------------------------
 
 
 async function LogCompanyRequests(insurance, companySigner) {
