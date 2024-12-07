@@ -21,6 +21,7 @@ contract DecentralizedInsurance {
         uint planId; // ID of the insurance plan requested
         bool Company_Approved; // Approval status of the request by the company
         bool Customer_Approved; // Approval status of the request by the Customer
+        int isActive; // Check the status of request wheter active (1) / draft(0) / decline(-1);
         bool isClaimed; // Status to check if a claim has been made on this request
         uint claimAmount; // Amount claimed by the customer
     }
@@ -132,6 +133,7 @@ contract DecentralizedInsurance {
             planId: _planId,
             Company_Approved: false,
             Customer_Approved: false,
+            isActive: 0,
             isClaimed: false,
             claimAmount: 0
         });
@@ -147,18 +149,29 @@ contract DecentralizedInsurance {
         Request storage req = requests[_requestId];
         // Ensure the caller is the customer who made the request
         require(req.customer == msg.sender, "Not authorized.");
+        //Ensure the Request is currently active
+        require(
+            req.isActive == 0,
+            "Request is either approved or declined. Result is final."
+        );
         // Ensure the request has not already been approved
         require(!req.Customer_Approved, "Request already approved.");
         // Ensure the request has been approved by the company
         require(req.Company_Approved, "Request is not approved.");
         // Deny the offer by setting isApproved to false
         req.Customer_Approved = false;
+        req.isActive = -1;
     }
 
     function acceptOffer(uint _requestId) external {
         Request storage req = requests[_requestId];
         // Ensure the caller is the customer who made the request
         require(req.customer == msg.sender, "Not authorized.");
+        //Ensure the Request is currently active
+        require(
+            req.isActive == 0,
+            "Request is either approved or declined. Result is final."
+        );
         // Ensure the request has been approved by the company
         require(req.Company_Approved, "Request is not approved.");
         // Ensure no claim has already been made on this request
@@ -166,9 +179,7 @@ contract DecentralizedInsurance {
         // Accept the offer by setting isApproved to true
         req.isClaimed = true;
         req.Customer_Approved = true;
-
-        // Set the claim amount to the approved amount
-        require(req.claimAmount > 0, "Invalid claim amount.");
+        req.isActive = 1;
 
         // payable(req.customer).transfer(req.claimAmount); // Not sure how to check this yet
     }
@@ -247,7 +258,7 @@ contract DecentralizedInsurance {
         return companyRequests;
     }
     // Approve or deny customer requests, with the option for counter-offers
-    function Request_decision_By_Company (
+    function Request_decision_By_Company(
         uint _requestId,
         bool _approve
     ) external {
@@ -258,8 +269,17 @@ contract DecentralizedInsurance {
             "Only the company can evaluate requests."
         );
 
+        //Check the request is currently active or Decline
+        require(
+            requests[_requestId].isActive == 0,
+            "Request is either approved or declined. Result is final."
+        );
+
         if (_approve) {
             req.Company_Approved = true;
+        } else {
+            req.Company_Approved = false;
+            req.isActive = -1;
         }
 
         emit RequestResponded(_requestId, _approve);
@@ -290,7 +310,7 @@ contract DecentralizedInsurance {
             "Only the company can settle claims."
         );
         require(req.Company_Approved, "Request not approved by company.");
-        require(req.Customer_Approved,"Request not approved by customer.");
+        require(req.Customer_Approved, "Request not approved by customer.");
         require(!req.isClaimed, "Claim already settled.");
 
         uint claimAmount = insurancePlans[req.planId].coverageAmount >
