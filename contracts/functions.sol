@@ -19,7 +19,8 @@ contract DecentralizedInsurance {
         uint id; // Unique identifier for the request
         address customer; // Address of the customer making the request
         uint planId; // ID of the insurance plan requested
-        bool isApproved; // Approval status of the request by the company
+        bool Company_Approved; // Approval status of the request by the company
+        bool Customer_Approved; // Approval status of the request by the Customer
         bool isClaimed; // Status to check if a claim has been made on this request
         uint claimAmount; // Amount claimed by the customer
     }
@@ -74,22 +75,14 @@ contract DecentralizedInsurance {
 
     // CUSTOMER FUNCTIONS
 
-
-
     modifier adminCheck() {
         require(msg.sender == admin, "Only admin.");
         _;
     }
 
-    function registerCustomer(
-        string memory _name,
-        uint _rate
-    ) external{
+    function registerCustomer(string memory _name, uint _rate) external {
         // Register the customer (they can self register)
-        require(
-            !customers[_name].isRegistered,
-            "Customer already registered."
-        );
+        require(!customers[_name].isRegistered, "Customer already registered.");
         customers[_name] = Customer({
             addr: msg.sender,
             name: _name,
@@ -100,11 +93,10 @@ contract DecentralizedInsurance {
         emit CustomerRegistered(msg.sender, _rate);
     }
 
-    function getCustomer(string memory _name) public view returns (Customer memory){
-        require(
-            !customers[_name].isRegistered,
-            "Customer already registered."
-        );
+    function getCustomer(
+        string memory _name
+    ) public view returns (Customer memory) {
+        require(!customers[_name].isRegistered, "Customer already registered.");
         return customers[_name];
     }
 
@@ -128,14 +120,8 @@ contract DecentralizedInsurance {
         return activePlans;
     }
 
-    function submitRequest(
-        string memory name_,
-        uint _planId
-    ) external{
-        require(
-            customers[name_].isRegistered,
-            "Customer not registered."
-        );
+    function submitRequest(string memory name_, uint _planId) external {
+        require(customers[name_].isRegistered, "Customer not registered.");
         // Ensure the selected insurance plan is active
         require(insurancePlans[_planId].isActive, "Invalid insurance plan.");
 
@@ -144,7 +130,8 @@ contract DecentralizedInsurance {
             id: nextRequestId,
             customer: msg.sender,
             planId: _planId,
-            isApproved: false,
+            Company_Approved: false,
+            Customer_Approved: false,
             isClaimed: false,
             claimAmount: 0
         });
@@ -161,11 +148,11 @@ contract DecentralizedInsurance {
         // Ensure the caller is the customer who made the request
         require(req.customer == msg.sender, "Not authorized.");
         // Ensure the request has not already been approved
-        require(!req.isApproved, "Request already approved.");
+        require(!req.Customer_Approved, "Request already approved.");
         // Ensure the request has been approved by the company
-        require(req.isApproved, "Request is not approved.");
+        require(req.Company_Approved, "Request is not approved.");
         // Deny the offer by setting isApproved to false
-        req.isApproved = false;
+        req.Customer_Approved = false;
     }
 
     function acceptOffer(uint _requestId) external {
@@ -173,16 +160,17 @@ contract DecentralizedInsurance {
         // Ensure the caller is the customer who made the request
         require(req.customer == msg.sender, "Not authorized.");
         // Ensure the request has been approved by the company
-        require(req.isApproved, "Request is not approved.");
+        require(req.Company_Approved, "Request is not approved.");
         // Ensure no claim has already been made on this request
         require(!req.isClaimed, "Request already claimed.");
         // Accept the offer by setting isApproved to true
         req.isClaimed = true;
+        req.Customer_Approved = true;
 
         // Set the claim amount to the approved amount
         require(req.claimAmount > 0, "Invalid claim amount.");
 
-        payable(req.customer).transfer(req.claimAmount); // Not sure how to check this yet
+        // payable(req.customer).transfer(req.claimAmount); // Not sure how to check this yet
     }
 
     function payPremium(uint _planId) external payable {
@@ -259,21 +247,19 @@ contract DecentralizedInsurance {
         return companyRequests;
     }
     // Approve or deny customer requests, with the option for counter-offers
-    function Request_Negotiation(
+    function Request_decision_By_Company (
         uint _requestId,
-        bool _approve,
-        uint _counterClaimAmount
+        bool _approve
     ) external {
         Request storage req = requests[_requestId];
+        uint256 companyId = companyIds[msg.sender];
         require(
-            companies[req.planId].addr == msg.sender,
+            insurancePlans[requests[_requestId].planId].companyId == companyId,
             "Only the company can evaluate requests."
         );
 
         if (_approve) {
-            req.isApproved = true;
-        } else if (_counterClaimAmount > 0) {
-            req.claimAmount = _counterClaimAmount;
+            req.Company_Approved = true;
         }
 
         emit RequestResponded(_requestId, _approve);
@@ -303,7 +289,8 @@ contract DecentralizedInsurance {
             companies[req.planId].addr == msg.sender,
             "Only the company can settle claims."
         );
-        require(req.isApproved, "Request not approved.");
+        require(req.Company_Approved, "Request not approved by company.");
+        require(req.Customer_Approved,"Request not approved by customer.");
         require(!req.isClaimed, "Claim already settled.");
 
         uint claimAmount = insurancePlans[req.planId].coverageAmount >
@@ -340,7 +327,6 @@ contract DecentralizedInsurance {
         // Ensure that only the admin can call this function
         require(msg.sender == admin, "Only admin.");
 
-        
         // Retrieve the company's info before deletion
         string memory companyName = companies[_companyId].name;
         address companyAddress = companies[_companyId].addr;
@@ -355,10 +341,7 @@ contract DecentralizedInsurance {
         // Ensure that only the admin can call this function
         require(msg.sender == admin, "Only admin.");
         // Ensure that this specific name isn't banned
-        require(
-            !bannedCompanyNames[_name],
-            "Company name is banned."
-        );
+        require(!bannedCompanyNames[_name], "Company name is banned.");
 
         // Check if the company name is already registered
         for (uint i = 1; i < nextCompanyId; i++) {

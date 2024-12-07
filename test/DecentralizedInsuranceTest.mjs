@@ -116,8 +116,7 @@ console.log("----------------  Test 1. Register Function------------------------
 7. If user accepts then they can register, if they deny do nothing
 */
 
-
-   it("Should allow user to view plans, submit a request, and handle negotiation process", async function () {
+   it("Should allow user to view plans, submit a request, and handle request approval process", async function () {
         console.log("\n\n")
         console.log("----------------  Test 2. User interacts with plans and requests --------------------");
 
@@ -190,26 +189,36 @@ console.log("----------------  Test 1. Register Function------------------------
         
 
         // Company pull list and view existing request
-        const company2Requests = await insurance.connect(company2Signer).viewRequests();
+        let company2Requests = await insurance.connect(company2Signer).viewRequests();
         console.log("\nCompany 2's Requests:");
+        console.log(`Request ID.    PlanID    Company_Approval    Customer_Approval\n`)
         for (let i = 0; i < company2Requests.length; i++) {
-            console.log(`Request ${i + 1}: ID: ${company2Requests[i].planId}`);
+            console.log(`  ${i + 1}              ${company2Requests[i].planId}         ${company2Requests[i].Company_Approved}               ${company2Requests[i].Customer_Approved}`);
         }
 
  
         // Company approves request
         console.log("\nCompany 2 sees the request and approve the request");
-        // const requestId = company2Requests[0].id;
         console.log("Company 2 approved the request and sends offer!");
 
+        let requestId = 1;
         try{
-            await insurance.connect(company2Signer).Request_Negotiation(requestId, true, 0);
-        }catch(error){
-            console.log("Error in step 4")
-        }
+            await insurance.connect(company2Signer).Request_decision_By_Company(requestId, true);
 
-        // const userSigner = await ethers.getSigner(customer.addr);
-        // await insurance.connect(userSigner).denyOffer(requestId);
+            // Print updated requests status
+            company2Requests = await insurance.connect(company2Signer).viewRequests();
+            console.log(`\nNew Updated Request Status`)
+            console.log(`Request ID.    PlanID    Company_Approval    Customer_Approval\n`)
+            for (let i = 0; i < company2Requests.length; i++) {
+                console.log(`  ${i + 1}              ${company2Requests[i].planId}         ${company2Requests[i]. Company_Approved}               ${company2Requests[i].Customer_Approved}`);
+            }
+        }catch(error){
+            console.log("Error in step 4", error.message)
+        }
+        
+
+        const userSigner = await ethers.getSigner(customer.addr);
+        await insurance.connect(userSigner).denyOffer(requestId);
 
         // console.log("\nUser reviews the offer");
         // const acceptOffer = true; // Depends on the userInput if true = accept/ false = deny
@@ -242,3 +251,18 @@ console.log("----------------  Test 1. Register Function------------------------
     
     
 })
+
+
+
+async function fetchAndLogCompanyRequests(insurance, companySigner) {
+    let companyRequests = await insurance.connect(companySigner).viewRequests();
+
+    // Print header
+    console.log("\nCompany's Requests:");
+    console.log(`Request ID    PlanID    Company_Approval    Customer_Approval\n`);
+
+    // Loop through the requests and print details
+    for (let i = 0; i < companyRequests.length; i++) {
+        console.log(`  ${i + 1}            ${companyRequests[i].planId}         ${companyRequests[i].Company_Approved}               ${companyRequests[i].Customer_Approved}`);
+    }
+}
