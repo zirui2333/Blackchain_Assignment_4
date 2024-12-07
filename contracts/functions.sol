@@ -99,7 +99,10 @@ contract DecentralizedInsurance {
         string memory _name
     ) public view returns (Customer memory) {
         require(customers[_name].isRegistered, "Customer is not registered.");
-        return customers[_name];
+            // Access control: Only the customer themselves or the admin can retrieve details
+        require(
+            msg.sender == customers[_name].addr || msg.sender == admin,
+        );
     }
 
     function viewPlans() external view returns (InsurancePlan[] memory) {
