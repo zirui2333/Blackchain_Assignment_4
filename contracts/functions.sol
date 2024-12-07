@@ -217,6 +217,7 @@ contract DecentralizedInsurance {
             companies[companyId].addr != address(0),
             "Not a registered company."
         );
+        require(!bannedCompanyNames[companies[companyId].name], "Company is banned.");
 
         insurancePlans[nextPlanId] = InsurancePlan({
             id: nextPlanId,
@@ -276,6 +277,8 @@ contract DecentralizedInsurance {
             "Request is either approved or declined. Result is final."
         );
 
+        require(!bannedCompanyNames[companies[companyId].name], "Company is banned.");
+
         if (_approve) {
             req.Company_Approved = true;
         } else {
@@ -300,6 +303,7 @@ contract DecentralizedInsurance {
             insurancePlans[_planId].isActive != _status,
             "No change in status."
         );
+        require(!bannedCompanyNames[companies[companyId].name], "Company is banned.");
 
         insurancePlans[_planId].isActive = _status;
     }

@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/ziruizheng/Desktop/College Class/Now/Blockchain/Blackchain_Assignment_4/contracts/functions.sol": {
-      "lastModificationDate": 1733588590751,
-      "contentHash": "4961ff1de60b54ab0eaf9347a899dd91",
+      "lastModificationDate": 1733588882889,
+      "contentHash": "d43de5e48dfe4f7870b805719c30b810",
       "sourceName": "contracts/functions.sol",
       "solcConfig": {
         "version": "0.8.0",
