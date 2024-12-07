@@ -346,6 +346,28 @@ it("Should return the correct customer details and handle access control", async
         console.log("Payment for nonexistent plan rejected as expected.");
     });
 
+    it("Should fail if the incorrect premium amount is sent", async function () {
+        console.log("----------------  Test 4: payPremium Incorrect Premium Amount Test -------------------------");
+
+        const incorrectAmount = ethers.utils.parseEther("0.5"); // Less than the premium
+        const correctAmount = ethers.utils.parseEther("1.0"); // The actual premium
+
+        // Customer sends incorrect premium amount
+        await expect(
+        insurance.connect(customer).payPremium(1, { value: incorrectAmount })
+        ).to.be.revertedWith("Incorrect premium amount.");
+
+        console.log("Payment with incorrect premium amount rejected as expected.");
+
+        // Customer sends the correct amount
+        await expect(
+        insurance.connect(customer).payPremium(1, { value: correctAmount })
+        ).to.emit(insurance, "PremiumPaid");
+
+        console.log("Payment with correct premium amount succeeded.");
+    });
+
+
 // -------------------------- Helper Function: Log Company Requests --------------------------
 
 
