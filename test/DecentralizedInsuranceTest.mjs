@@ -250,7 +250,7 @@ console.log("----------------  Test 1. Register Function------------------------
     
 })
 
-// -------------------------- Test 3: getCustomer Function Test ----------------------------------
+// -------------------------- Test 3: getCustomer Function Test ---------------------------------
 
 it("Should return the correct customer details and handle access control", async function () {
     console.log("----------------  Test 3: getCustomer Function Test -------------------------");
@@ -290,6 +290,48 @@ it("Should return the correct customer details and handle access control", async
   });
 
 
+  // -------------------------- Test 4: payPremium Function Test ----------------------------------
+    it("Should allow a customer to pay premium for an active plan", async function () {
+        console.log("----------------  Test 4: payPremium Function Test -------------------------");
+
+        // Set platform fee to 10% for testing
+        await insurance.connect(admin).setPlatformFee(10);
+        console.log("Platform fee set to 10%.");
+
+        // Get balances before the transaction
+        const adminBalanceBefore = await ethers.provider.getBalance(admin.address);
+        const companyBalanceBefore = await ethers.provider.getBalance(company.address);
+
+        // Customer pays the premium
+        const planId = 1;
+        const premiumAmount = ethers.utils.parseEther("1.0");
+        console.log("Customer pays premium:", premiumAmount.toString(), "ETH.");
+
+        // Pay the premium
+        await expect(
+        insurance.connect(customer).payPremium(planId, { value: premiumAmount })
+        ).to.emit(insurance, "PremiumPaid").withArgs(planId, customer.address, premiumAmount);
+
+        console.log("Premium paid successfully.");
+
+        // Calculate expected amounts
+        const platformFee = premiumAmount.mul(10).div(100); // 10% fee
+        const companyShare = premiumAmount.sub(platformFee); // Remaining sent to company
+
+        // Get balances after the transaction
+        const adminBalanceAfter = await ethers.provider.getBalance(admin.address);
+        const companyBalanceAfter = await ethers.provider.getBalance(company.address);
+
+        // Validate balances
+        expect(adminBalanceAfter.sub(adminBalanceBefore)).to.equal(platformFee);
+        expect(companyBalanceAfter.sub(companyBalanceBefore)).to.equal(companyShare);
+
+        console.log(
+        `Admin received fee: ${ethers.utils.formatEther(platformFee)} ETH. Company received share: ${ethers.utils.formatEther(
+            companyShare
+        )} ETH.`
+        );
+    });
 
 // -------------------------- Helper Function: Log Company Requests --------------------------
 
