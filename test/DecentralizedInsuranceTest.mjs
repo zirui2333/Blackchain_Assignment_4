@@ -333,6 +333,19 @@ it("Should return the correct customer details and handle access control", async
         );
     });
 
+    it("Should fail if the plan does not exist", async function () {
+        console.log("----------------  payPremium Nonexistent Plan Test -------------------------");
+
+        const premiumAmount = ethers.utils.parseEther("1.0");
+
+        // Attempt to pay for a nonexistent plan
+        await expect(
+        insurance.connect(customer).payPremium(999, { value: premiumAmount })
+        ).to.be.revertedWith("Invalid plan.");
+
+        console.log("Payment for nonexistent plan rejected as expected.");
+    });
+
 // -------------------------- Helper Function: Log Company Requests --------------------------
 
 
