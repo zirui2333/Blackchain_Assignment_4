@@ -64,8 +64,6 @@ contract DecentralizedInsurance {
     event RequestResponded(uint requestId, bool isApproved);
     // Event emitted when a customer pays the premium
     event PremiumPaid(uint planId, address customer, uint amount);
-    // Event emitted when a claim is settled
-    event ClaimSettled(uint requestId, uint claimAmount);
 
     // Added an event to log registrations
     event CustomerRegistered(address customer, uint rate);
@@ -99,7 +97,7 @@ contract DecentralizedInsurance {
         string memory _name
     ) public view returns (Customer memory) {
         require(customers[_name].isRegistered, "Customer is not registered.");
-            // Access control: Only the customer themselves or the admin can retrieve details
+        // Access control: Only the customer themselves or the admin can retrieve details
         require(
             msg.sender == customers[_name].addr || msg.sender == admin,
             "Not authorized to view customer details." // Throws error if not authorized
@@ -197,8 +195,10 @@ contract DecentralizedInsurance {
         // Ensure the sent amount matches the premium amount
         require(msg.value == plan.premium, "Incorrect premium amount.");
         // Ensures it maps to a valid company
-        require(companies[plan.companyId].addr != address(0), "Invalid company."); 
-
+        require(
+            companies[plan.companyId].addr != address(0),
+            "Invalid company."
+        );
 
         // Calculate the platform fee based on the premium
         uint fee = (msg.value * platformFee) / 100;
@@ -224,7 +224,10 @@ contract DecentralizedInsurance {
             companies[companyId].addr != address(0),
             "Not a registered company."
         );
-        require(!bannedCompanyNames[companies[companyId].name], "Company is banned.");
+        require(
+            !bannedCompanyNames[companies[companyId].name],
+            "Company is banned."
+        );
 
         insurancePlans[nextPlanId] = InsurancePlan({
             id: nextPlanId,
@@ -284,7 +287,10 @@ contract DecentralizedInsurance {
             "Request is either approved or declined. Result is final."
         );
 
-        require(!bannedCompanyNames[companies[companyId].name], "Company is banned.");
+        require(
+            !bannedCompanyNames[companies[companyId].name],
+            "Company is banned."
+        );
 
         if (_approve) {
             req.Company_Approved = true;
@@ -310,31 +316,12 @@ contract DecentralizedInsurance {
             insurancePlans[_planId].isActive != _status,
             "No change in status."
         );
-        require(!bannedCompanyNames[companies[companyId].name], "Company is banned.");
+        require(
+            !bannedCompanyNames[companies[companyId].name],
+            "Company is banned."
+        );
 
         insurancePlans[_planId].isActive = _status;
-    }
-    // Settle claims if conditions are met
-    function settleClaim(uint _requestId) external {
-        Request storage req = requests[_requestId];
-        require(
-            companies[req.planId].addr == msg.sender,
-            "Only the company can settle claims."
-        );
-        require(req.Company_Approved, "Request not approved by company.");
-        require(req.Customer_Approved, "Request not approved by customer.");
-        require(!req.isClaimed, "Claim already settled.");
-
-        uint claimAmount = insurancePlans[req.planId].coverageAmount >
-            req.claimAmount
-            ? req.claimAmount
-            : insurancePlans[req.planId].coverageAmount;
-
-        // Transfer the claim amount to the customer
-        payable(req.customer).transfer(claimAmount);
-        req.isClaimed = true;
-
-        emit ClaimSettled(_requestId, claimAmount);
     }
 
     // ADMIN FUNCTIONS
@@ -408,27 +395,26 @@ contract DecentralizedInsurance {
     }
 
     function listBannedCompanies() external view returns (string[] memory) {
-    // Count the number of banned companies
-    uint count = 0;
-    for (uint i = 1; i < nextCompanyId; i++) {
-        if (bannedCompanyNames[companies[i].name]) {
-            count++;
+        // Count the number of banned companies
+        uint count = 0;
+        for (uint i = 1; i < nextCompanyId; i++) {
+            if (bannedCompanyNames[companies[i].name]) {
+                count++;
+            }
         }
-    }
 
-    // Create an array to store the names of banned companies
-    string[] memory bannedCompanies = new string[](count);
-    uint index = 0;
+        // Create an array to store the names of banned companies
+        string[] memory bannedCompanies = new string[](count);
+        uint index = 0;
 
-    // Iterate through the companies and add the banned ones to the array
-    for (uint i = 1; i < nextCompanyId; i++) {
-        if (bannedCompanyNames[companies[i].name]) {
-            bannedCompanies[index] = companies[i].name;
-            index++;
+        // Iterate through the companies and add the banned ones to the array
+        for (uint i = 1; i < nextCompanyId; i++) {
+            if (bannedCompanyNames[companies[i].name]) {
+                bannedCompanies[index] = companies[i].name;
+                index++;
+            }
         }
-    }
 
-    return bannedCompanies; // Return the array of banned company names
-}
-    
+        return bannedCompanies; // Return the array of banned company names
+    }
 }
