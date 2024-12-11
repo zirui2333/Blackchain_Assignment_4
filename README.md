@@ -39,7 +39,7 @@ The Insurance Trading System is a blockchain-based platform designed to enhance 
 1. `View Requests`: List insurance requests from customers.
 2. `CreatePlans`: Add or modify insurance plans they offer.
 3. `Request_decision_By_Company`: Approve or deny requests.
-4. `SettleClaim`: Verify and settle claims submitted by customers if insurance conditions are met (Untested).
+4. `SettleClaim`(Untested): Verify and settle claims submitted by customers if insurance conditions are met .
 
 ### Platform Administrators (Organization)
 
